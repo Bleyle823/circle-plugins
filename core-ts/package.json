@@ -1,0 +1,54 @@
+{
+  "name": "@circle-agent-kit/core",
+  "version": "0.1.0",
+  "description": "Unified Circle + Arc agent-wallet SDK: wallets, USDC transfers, x402 nanopayments, and payment requests.",
+  "license": "Apache-2.0",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "keywords": [
+    "circle",
+    "usdc",
+    "arc",
+    "x402",
+    "nanopayments",
+    "wallets"
+  ],
+  "dependencies": {
+    "@circle-fin/adapter-circle-wallets": "^1.4.1",
+    "@circle-fin/app-kit": "^1.8.1",
+    "@circle-fin/developer-controlled-wallets": "^10.8.0",
+    "uuid": "^11.0.0"
+  },
+  "peerDependencies": {
+    "@circle-fin/x402-batching": "^3.2.0"
+  },
+  "peerDependenciesMeta": {
+    "@circle-fin/x402-batching": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@circle-fin/x402-batching": "^3.2.0",
+    "@types/node": "^22.0.0",
+    "@types/uuid": "^10.0.0",
+    "tsup": "^8.3.0",
+    "typescript": "^5.9.2",
+    "vitest": "^2.1.0"
+  }
+}
