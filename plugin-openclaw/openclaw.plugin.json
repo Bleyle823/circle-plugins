@@ -1,0 +1,50 @@
+{
+  "id": "circle-agent-kit",
+  "name": "Circle Agent Kit",
+  "version": "0.1.0",
+  "description": "Circle + Arc agent wallet: balances, USDC transfers, x402 nanopayments, and payment requests.",
+  "entry": "dist/index.js",
+  "activation": {
+    "onStartup": false
+  },
+  "config": {
+    "CIRCLE_API_KEY": { "type": "string", "secret": true, "description": "Circle API key (PREFIX:ID:SECRET)." },
+    "ENTITY_SECRET": { "type": "string", "secret": true, "description": "32-byte hex entity secret (registered by you)." },
+    "CIRCLE_NETWORK": { "type": "string", "default": "TESTNET", "description": "TESTNET or MAINNET." },
+    "CIRCLE_DEFAULT_CHAIN": { "type": "string", "default": "ARC-TESTNET", "description": "Default chain id." },
+    "X402_PRIVATE_KEY": { "type": "string", "secret": true, "description": "Buyer key for x402 nanopayments." },
+    "X402_CHAIN": { "type": "string", "default": "base-sepolia", "description": "Chain for x402 nanopayments." },
+    "CIRCLE_CLI_BIN": { "type": "string", "default": "circle", "description": "Circle CLI binary for Agent Stack ops (npm i -g @circle-fin/cli)." },
+    "SWAP_API_URL": { "type": "string", "description": "DEX aggregator base URL for SDK-native swaps (0x-compatible)." },
+    "SWAP_API_KEY": { "type": "string", "secret": true, "description": "DEX aggregator API key (e.g. 0x)." }
+  },
+  "contracts": {
+    "tools": [
+      { "name": "circle_create_wallet", "optional": false },
+      { "name": "circle_check_balance", "optional": false },
+      { "name": "circle_faucet_info", "optional": false },
+      { "name": "circle_request_usdc", "optional": false },
+      { "name": "circle_gateway_balance", "optional": false },
+      { "name": "circle_swap_quote", "optional": false },
+      { "name": "circle_send_usdc", "optional": true },
+      { "name": "circle_pay_x402", "optional": true },
+      { "name": "circle_gateway_deposit", "optional": true },
+      { "name": "circle_execute_contract", "optional": true },
+      { "name": "circle_bridge_usdc", "optional": true },
+      { "name": "circle_swap", "optional": true },
+      { "name": "circle_agent_login_init", "optional": false },
+      { "name": "circle_agent_login_complete", "optional": false },
+      { "name": "circle_agent_list_wallets", "optional": false },
+      { "name": "circle_agent_balance", "optional": false },
+      { "name": "circle_agent_bridge_fee", "optional": false },
+      { "name": "circle_agent_bridge_status", "optional": false },
+      { "name": "circle_agent_swap_quote", "optional": false },
+      { "name": "circle_agent_contract_address", "optional": false },
+      { "name": "circle_agent_fund", "optional": true },
+      { "name": "circle_agent_transfer", "optional": true },
+      { "name": "circle_agent_bridge", "optional": true },
+      { "name": "circle_agent_swap", "optional": true },
+      { "name": "circle_agent_execute_contract", "optional": true }
+    ]
+  }
+}
