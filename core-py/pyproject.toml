@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "circle-agent-kit"
+version = "0.1.0"
+description = "Unified Circle + Arc agent-wallet SDK (Python core): wallets, USDC transfers, x402 nanopayments, payment requests."
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "Apache-2.0" }
+keywords = ["circle", "usdc", "arc", "x402", "nanopayments", "wallets", "agent"]
+dependencies = [
+  "requests>=2.31",
+]
+
+[project.optional-dependencies]
+circle = ["circle-developer-controlled-wallets>=8.0.0"]
+dev = ["pytest>=8.0", "ruff>=0.6"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py39"
