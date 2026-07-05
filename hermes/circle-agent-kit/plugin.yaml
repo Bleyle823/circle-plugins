@@ -1,0 +1,27 @@
+name: circle-agent-kit
+version: 0.1.0
+description: >
+  Circle + Arc agent wallet for Hermes: check balances, send USDC, make gas-free
+  x402 nanopayments, and create USDC payment requests. Arc Testnet by default.
+requires_env:
+  - name: CIRCLE_API_KEY
+    description: "Circle API key (format PREFIX:ID:SECRET) from console.circle.com"
+    url: "https://console.circle.com"
+    secret: true
+  - name: ENTITY_SECRET
+    description: "32-byte hex entity secret you generate and register yourself"
+    url: "https://developers.circle.com/wallets/dev-controlled/register-entity-secret"
+    secret: true
+optional_env:
+  - name: CIRCLE_NETWORK
+    description: "TESTNET (default) or MAINNET"
+  - name: CIRCLE_DEFAULT_CHAIN
+    description: "Default chain id, e.g. ARC-TESTNET"
+  - name: CIRCLE_WALLET_SET_ID
+    description: "Reuse an existing wallet set instead of creating one"
+  - name: X402_PRIVATE_KEY
+    description: "Buyer key for x402 nanopayments"
+    secret: true
+  - name: CIRCLE_KIT_KEY
+    description: "Circle App Kit key for SDK-native swaps"
+    secret: true
