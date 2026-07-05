@@ -1,0 +1,38 @@
+{
+  "name": "@circle-agent-kit/plugin-eliza",
+  "version": "0.1.0",
+  "description": "ElizaOS plugin for Circle + Arc agent wallets: USDC transfers, x402 nanopayments, and payment requests.",
+  "license": "Apache-2.0",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "keywords": ["elizaos", "eliza", "plugin", "circle", "usdc", "arc", "x402"],
+  "agentConfig": {
+    "pluginType": "elizaos:plugin:1.0.0"
+  },
+  "dependencies": {
+    "@circle-agent-kit/core": "workspace:*"
+  },
+  "peerDependencies": {
+    "@elizaos/core": ">=1.7.0"
+  },
+  "devDependencies": {
+    "@elizaos/core": "^1.7.2",
+    "@types/node": "^22.0.0",
+    "typescript": "^5.9.2",
+    "vitest": "^2.1.0"
+  }
+}
