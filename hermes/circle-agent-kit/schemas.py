@@ -73,17 +73,38 @@ PAY_X402 = {
     "name": "circle_pay_x402",
     "description": (
         "Pay for an x402-compatible resource with a gas-free USDC nanopayment via "
-        "Circle Gateway. Use to pay per-request for APIs, compute, or data."
+        "Circle Gateway. Omit url to use the default local paywall (/risk-profile)."
     ),
     "parameters": {
         "type": "object",
         "properties": {
-            "url": {"type": "string", "description": "URL of the x402-compatible resource."},
+            "url": {
+                "type": "string",
+                "description": "URL of the x402-compatible resource (default: local paywall).",
+            },
             "method": {"type": "string", "description": "HTTP method (default GET)."},
             "body": {"type": "string", "description": "Optional request body."},
             "headers": {"type": "object", "description": "Optional request headers."},
         },
-        "required": ["url"],
+    },
+}
+
+REQUEST_FAUCET = {
+    "name": "circle_request_faucet",
+    "description": (
+        "Request free testnet USDC (and native gas when needed) from the Circle faucet API. "
+        "Testnet only — falls back to CIRCLE_WALLET_ID when wallet_id is omitted."
+    ),
+    "parameters": {
+        "type": "object",
+        "properties": {
+            "wallet_id": {"type": "string", "description": "Wallet id to fund."},
+            "address": {"type": "string", "description": "Wallet address to fund (alternative)."},
+            "chain": {"type": "string", "description": "Chain id (default configured)."},
+            "native": {"type": "boolean", "description": "Request native gas."},
+            "usdc": {"type": "boolean", "description": "Request USDC (default true)."},
+            "eurc": {"type": "boolean", "description": "Request EURC (default false)."},
+        },
     },
 }
 

@@ -7,7 +7,13 @@ the TypeScript plugins for Eliza and OpenClaw.
 from __future__ import annotations
 
 import json
+import os
 from typing import Any
+
+try:
+    from .params import resolve_paywall_url
+except ImportError:
+    from params import resolve_paywall_url
 
 try:
     from circle_agent_kit import CircleAgentKit, CircleAgentError
@@ -78,12 +84,23 @@ request_usdc = _wrap(
 
 pay_x402 = _wrap(
     lambda kit, a: kit.pay_x402(
-        a["url"],
+        resolve_paywall_url(a.get("url")),
         {
             "method": a.get("method"),
             "body": a.get("body"),
             "headers": a.get("headers"),
         },
+    )
+)
+
+request_faucet = _wrap(
+    lambda kit, a: kit.request_faucet(
+        wallet_id=a.get("wallet_id") or os.getenv("CIRCLE_WALLET_ID"),
+        address=a.get("address"),
+        chain=a.get("chain"),
+        native=a.get("native"),
+        usdc=a.get("usdc"),
+        eurc=a.get("eurc"),
     )
 )
 

@@ -2,7 +2,10 @@
 
 import logging
 
-from . import schemas, tools
+try:
+    from . import schemas, tools
+except ImportError:
+    import schemas, tools
 
 logger = logging.getLogger(__name__)
 
@@ -20,7 +23,8 @@ def _handle_circle_command(raw_args: str) -> str:
             "model. Dev-controlled: circle_create_wallet, circle_check_balance, "
             "circle_send_usdc, circle_request_usdc, circle_pay_x402, "
             "circle_gateway_deposit, circle_gateway_balance, circle_faucet_info, "
-            "circle_execute_contract, circle_bridge_usdc, circle_swap_quote, circle_swap."
+            "circle_request_faucet, circle_execute_contract, circle_bridge_usdc, "
+            "circle_swap_quote, circle_swap."
         )
     return f"Unknown /circle argument '{arg}'. Try /circle help."
 
@@ -46,6 +50,7 @@ def register(ctx):
         (schemas.CREATE_WALLET, tools.create_wallet),
         (schemas.CHECK_BALANCE, tools.check_balance),
         (schemas.FAUCET_INFO, tools.faucet_info),
+        (schemas.REQUEST_FAUCET, tools.request_faucet),
         (schemas.SEND_USDC, tools.send_usdc),
         (schemas.REQUEST_USDC, tools.request_usdc),
         (schemas.PAY_X402, tools.pay_x402),

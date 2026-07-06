@@ -1,8 +1,9 @@
-name: circle-agent-kit
+name: circle-plugins
 version: 0.1.0
 description: >
-  Circle + Arc agent wallet for Hermes: check balances, send USDC, make gas-free
-  x402 nanopayments, and create USDC payment requests. Arc Testnet by default.
+  Circle Plugins for Hermes: check balances, send USDC, make gas-free
+  x402 nanopayments, request testnet faucet funds, and create USDC payment requests.
+  Arc Testnet by default.
 requires_env:
   - name: CIRCLE_API_KEY
     description: "Circle API key (format PREFIX:ID:SECRET) from console.circle.com"

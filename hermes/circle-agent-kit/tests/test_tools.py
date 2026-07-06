@@ -1,14 +1,9 @@
 import json
 import unittest
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 
-# Mock the circle_agent_kit core before importing tools
 import sys
-import os
 from types import ModuleType
-
-# Add the plugin directory to path so we can import from it
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 mock_core = ModuleType("circle_agent_kit_core")
 mock_core.CircleAgentKit = MagicMock()
@@ -116,7 +111,17 @@ class TestHermesTools(unittest.TestCase):
         self.mock_kit.pay_x402.return_value = {"url": "https://api"}
         res = json.loads(pay_x402({"url": "https://api"}))
         self.assertEqual(res["url"], "https://api")
-        self.mock_kit.pay_x402.assert_called_once()
+        self.mock_kit.pay_x402.assert_called_once_with(
+            "https://api",
+            {"method": None, "body": None, "headers": None},
+        )
+
+    def test_request_faucet(self):
+        from tools import request_faucet
+        self.mock_kit.request_faucet.return_value = {"chain": "ARC-TESTNET", "address": "0x1"}
+        res = json.loads(request_faucet({"address": "0x1", "chain": "ARC-TESTNET"}))
+        self.assertEqual(res["address"], "0x1")
+        self.mock_kit.request_faucet.assert_called_once()
 
     def test_request_usdc(self):
         from tools import request_usdc

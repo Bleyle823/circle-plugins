@@ -1,7 +1,7 @@
-# Circle Agent Kit — Hermes plugin
+# Circle Plugins — Hermes plugin
 
 Gives Hermes Agent a Circle + Arc wallet: balances, USDC transfers, gas-free
-x402 nanopayments, and USDC payment requests.
+x402 nanopayments, testnet faucet funding, and USDC payment requests.
 
 ## Install
 
@@ -15,7 +15,7 @@ pip install -e "packages/core-py[circle]"  # + official Circle SDK for live call
 2. Copy this plugin into your Hermes plugins dir:
 
 ```bash
-cp -r plugins/hermes/circle-agent-kit ~/.hermes/plugins/circle-agent-kit
+cp -r plugins/hermes/circle-agent-kit ~/.hermes/plugins/circle-plugins
 ```
 
 3. Enable it (plugins are disabled by default). In `~/.hermes/config.yaml`:
@@ -23,15 +23,16 @@ cp -r plugins/hermes/circle-agent-kit ~/.hermes/plugins/circle-agent-kit
 ```yaml
 plugins:
   enabled:
-    - circle-agent-kit
+    - circle-plugins
 ```
 
 4. Set env: `CIRCLE_API_KEY`, `ENTITY_SECRET` (and `X402_PRIVATE_KEY` for nanopayments).
+   Optional: `X402_PAYWALL_URL` or `X402_PAYWALL_PORT` for the default local paywall.
 
 ## What you get
 
 - **Tools** (toolset `circle`): `circle_create_wallet`, `circle_check_balance`,
-  `circle_faucet_info`, `circle_send_usdc`, `circle_request_usdc`,
+  `circle_faucet_info`, `circle_request_faucet`, `circle_send_usdc`, `circle_request_usdc`,
   `circle_pay_x402`, `circle_gateway_deposit`, `circle_gateway_balance`.
 - **Slash command**: `/circle status` (in-session).
 - **CLI command**: `hermes circle status`.
