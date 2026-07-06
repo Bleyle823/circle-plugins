@@ -4,7 +4,7 @@ import { circleTools, runTool } from "./tools.js";
 /**
  * OpenClaw plugin for Circle + Arc agent wallets.
  *
- * Registers agent-callable tools that wrap @circle-agent-kit/core. Money-moving
+ * Registers agent-callable tools that wrap @circle-plugins/core. Money-moving
  * tools (send, deposit, x402 pay) are marked `optional` so they require explicit
  * user opt-in per OpenClaw's tool-permission model.
  *

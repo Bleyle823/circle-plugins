@@ -1,5 +1,5 @@
 {
-  "name": "@circle-agent-kit/plugin-openclaw",
+  "name": "@circle-plugins/plugin-openclaw",
   "version": "0.1.0",
   "description": "OpenClaw plugin for Circle + Arc agent wallets: USDC transfers, x402 nanopayments, and payment requests.",
   "license": "Apache-2.0",
@@ -20,7 +20,7 @@
   },
   "keywords": ["openclaw", "plugin", "circle", "usdc", "arc", "x402", "nanopayments"],
   "dependencies": {
-    "@circle-agent-kit/core": "workspace:*"
+    "@circle-plugins/core": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",

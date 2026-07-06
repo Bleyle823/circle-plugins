@@ -1,4 +1,5 @@
-import { CircleAgentError, CircleAgentKit } from "@circle-agent-kit/core";
+import { CircleAgentError, CircleAgentKit } from "@circle-plugins/core";
+import { resolvePaywallUrl } from "./params.js";
 
 /** A framework-neutral tool definition; adapted to OpenClaw in index.ts. */
 export interface CircleTool {
@@ -49,6 +50,31 @@ export const circleTools: CircleTool[] = [
     run: async (kit, p) => kit.faucetInfo(p.chain),
   },
   {
+    name: "circle_request_faucet",
+    description:
+      "Request free testnet USDC (and native gas when needed) from the Circle faucet API. Testnet only.",
+    parameters: obj(
+      {
+        walletId: str("Wallet id to fund (falls back to CIRCLE_WALLET_ID)."),
+        address: str("Wallet address to fund (alternative to walletId)."),
+        chain: str("Chain id (default configured chain)."),
+        native: bool("Request native gas (default true on non-Arc chains)."),
+        usdc: bool("Request USDC (default true)."),
+        eurc: bool("Request EURC (default false)."),
+      },
+      []
+    ),
+    run: (kit, p) =>
+      kit.requestFaucet({
+        walletId: p.walletId ?? process.env.CIRCLE_WALLET_ID,
+        address: p.address,
+        chain: p.chain,
+        native: p.native,
+        usdc: p.usdc,
+        eurc: p.eurc,
+      }),
+  },
+  {
     name: "circle_send_usdc",
     description:
       "Send USDC from an agent wallet to a destination address. Mainnet or large transfers require confirm=true.",
@@ -96,17 +122,17 @@ export const circleTools: CircleTool[] = [
   },
   {
     name: "circle_pay_x402",
-    description: "Pay for an x402-compatible resource with a gas-free USDC nanopayment via Circle Gateway.",
+    description:
+      "Pay for an x402-compatible resource with a gas-free USDC nanopayment via Circle Gateway. " +
+      "Omit url to use the default local paywall (/risk-profile).",
     optional: true,
-    parameters: obj(
-      {
-        url: str("URL of the x402-compatible resource."),
-        method: str("HTTP method (default GET)."),
-        body: { description: "Optional request body." },
-      },
-      ["url"]
-    ),
-    run: (kit, p) => kit.payX402(p.url, { method: p.method, body: p.body }),
+    parameters: obj({
+      url: str("URL of the x402-compatible resource (default: local paywall /risk-profile)."),
+      method: str("HTTP method (default GET)."),
+      body: { description: "Optional request body." },
+    }),
+    run: (kit, p) =>
+      kit.payX402(resolvePaywallUrl(p.url), { method: p.method, body: p.body }),
   },
   {
     name: "circle_gateway_deposit",

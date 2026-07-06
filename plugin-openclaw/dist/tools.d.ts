@@ -1,4 +1,4 @@
-import { CircleAgentKit } from "@circle-agent-kit/core";
+import { CircleAgentKit } from "@circle-plugins/core";
 /** A framework-neutral tool definition; adapted to OpenClaw in index.ts. */
 export interface CircleTool {
     name: string;
