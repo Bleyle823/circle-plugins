@@ -24,13 +24,16 @@
     "pluginType": "elizaos:plugin:1.0.0"
   },
   "dependencies": {
-    "@circle-agent-kit/core": "workspace:*"
+    "@circle-agent-kit/core": "workspace:*",
+    "@circle-fin/x402-batching": "^3.2.0",
+    "express": "^5.2.1"
   },
   "peerDependencies": {
     "@elizaos/core": ">=1.7.0"
   },
   "devDependencies": {
     "@elizaos/core": "^1.7.2",
+    "@types/express": "^5.0.6",
     "@types/node": "^22.0.0",
     "typescript": "^5.9.2",
     "vitest": "^2.1.0"

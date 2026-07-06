@@ -2,6 +2,7 @@
 const IGNORE_OPTION_KEYS = new Set(["actionContext", "actionPlan", "onStreamChunk"]);
 const EVM_ADDRESS_RE = /0x[a-fA-F0-9]{40}/g;
 const URL_RE = /https?:\/\/[^\s]+/i;
+const LOCALHOST_URL_RE = /(?:https?:\/\/)?localhost(?::\d+)?(?:\/[^\s]*)?/i;
 const AMOUNT_WITH_UNIT_RE = /\b(\d+(?:\.\d+)?)\s*usdc\b/i;
 const VERB_AMOUNT_RE = /\b(?:send|transfer|pay|deposit|request)\s+(\d+(?:\.\d+)?)\b/i;
 const CONFIRM_RE = /\b(confirm|confirmed|yes,? do it|approved?|go ahead)\b/i;
@@ -22,8 +23,41 @@ export function extractAmount(text) {
     return verb ? verb[1] : undefined;
 }
 export function extractUrl(text) {
-    const m = text?.match(URL_RE);
-    return m ? m[0] : undefined;
+    if (!text)
+        return undefined;
+    const httpMatch = text.match(URL_RE);
+    if (httpMatch)
+        return normalizePaywallUrl(httpMatch[0]);
+    const localhostMatch = text.match(LOCALHOST_URL_RE);
+    if (localhostMatch) {
+        const raw = localhostMatch[0];
+        return normalizePaywallUrl(raw.startsWith("http") ? raw : `http://${raw}`);
+    }
+    if (/\b(risk[- ]?profile|paywall|x402)\b/i.test(text)) {
+        return defaultPaywallUrl();
+    }
+    return undefined;
+}
+export function defaultPaywallUrl() {
+    return (process.env.X402_PAYWALL_URL ??
+        `http://localhost:${process.env.X402_PAYWALL_PORT ?? "4021"}/risk-profile`);
+}
+/** Ensure paywall requests always hit the /risk-profile route. */
+export function normalizePaywallUrl(url) {
+    const trimmed = url.replace(/[),.]+$/, "");
+    if (trimmed.includes("api.example.com")) {
+        return defaultPaywallUrl();
+    }
+    if (/localhost(?::\d+)?\/?$/i.test(trimmed) || /127\.0\.0\.1(?::\d+)?\/?$/i.test(trimmed)) {
+        return trimmed.replace(/\/?$/, "/risk-profile");
+    }
+    if (trimmed.endsWith("/risk-profile")) {
+        return trimmed;
+    }
+    if (/localhost:\d+\/[^/]+$/i.test(trimmed) && !trimmed.endsWith("/risk-profile")) {
+        return defaultPaywallUrl();
+    }
+    return trimmed;
 }
 /** Keep only real tool params from the runtime-provided options object. */
 export function pickActionParams(options) {
@@ -42,10 +76,11 @@ export function pickActionParams(options) {
 /**
  * Resolve action params. Precedence (later wins):
  *   1. regex extraction from message text (+ prior responses)
- *   2. structured `message.content.params`
- *   3. explicit handler `options`
+ *   2. state values from providers (e.g. circleWalletId)
+ *   3. structured `message.content.params`
+ *   4. explicit handler `options`
  */
-export function resolveParams(message, options, responses) {
+export function resolveParams(message, state, options, responses) {
     const content = (message?.content ?? {});
     const text = String(content.text ?? "");
     const params = {};
@@ -70,10 +105,30 @@ export function resolveParams(message, options, responses) {
             params.confirm = true;
         }
     }
+    // Check state for provider-injected values
+    if (state) {
+        const stateValues = state?.values || state;
+        if (!params.walletId) {
+            const walletId = stateValues.circleWalletId ?? process.env.CIRCLE_WALLET_ID;
+            if (walletId)
+                params.walletId = String(walletId);
+        }
+        if (!params.chain && stateValues.circleChain) {
+            params.chain = stateValues.circleChain;
+        }
+        // Also check state.data for walletId
+        const stateData = state?.data;
+        if (!params.walletId && stateData?.walletId) {
+            params.walletId = stateData.walletId;
+        }
+    }
     if (content.params && typeof content.params === "object") {
         Object.assign(params, content.params);
     }
     Object.assign(params, pickActionParams(options));
+    if (!params.walletId && process.env.CIRCLE_WALLET_ID) {
+        params.walletId = process.env.CIRCLE_WALLET_ID;
+    }
     return params;
 }
 //# sourceMappingURL=params.js.map

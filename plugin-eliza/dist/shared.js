@@ -22,10 +22,10 @@ export function makeAction(spec) {
         name: spec.name,
         similes: spec.similes ?? [],
         description: spec.description,
-        validate: async (_runtime, _message) => true,
-        handler: async (runtime, message, _state, options, callback, responses) => {
+        validate: spec.validate ?? (async () => true),
+        handler: async (runtime, message, state, options, callback, responses) => {
             try {
-                const params = resolveParams(message, options, responses);
+                const params = resolveParams(message, state, options, responses);
                 assertRequired(spec, params);
                 const kit = getKit(runtime);
                 const result = await spec.run(kit, params);
@@ -53,9 +53,10 @@ export function makeAction(spec) {
 }
 /** Small helper for building example conversations. */
 export function convo(user, agent, action) {
+    const actions = action.includes(",") ? action.split(",").map((a) => a.trim()) : [action];
     return [
         { name: "user", content: { text: user } },
-        { name: "agent", content: { text: agent, action } },
+        { name: "agent", content: { text: agent, action: actions[0], actions } },
     ];
 }
 //# sourceMappingURL=shared.js.map

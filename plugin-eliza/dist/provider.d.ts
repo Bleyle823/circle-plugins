@@ -1,7 +1,6 @@
 import type { Provider } from "@elizaos/core";
 /**
- * Injects Circle wallet context into agent state so it can reason about funds and
- * pick the right action. Uses CIRCLE_WALLET_ID (setting/env) as the active wallet.
+ * Injects Circle wallet and nanopayment context (config only — no blocking API calls).
  */
 export declare const circleWalletProvider: Provider;
 //# sourceMappingURL=provider.d.ts.map

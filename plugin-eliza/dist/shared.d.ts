@@ -1,4 +1,4 @@
-import type { Action, ActionExample } from "@elizaos/core";
+import type { Action, ActionExample, IAgentRuntime, Memory } from "@elizaos/core";
 import { type CircleAgentKit } from "@circle-agent-kit/core";
 /** A Circle capability adapted into an ElizaOS Action. */
 export interface CircleActionSpec {
@@ -12,6 +12,8 @@ export interface CircleActionSpec {
     examples?: ActionExample[][];
     /** Params required before invoking the kit; missing ones raise a clear error. */
     requiredParams?: string[];
+    /** Optional validate; defaults to always true. */
+    validate?: (runtime: IAgentRuntime, message: Memory) => Promise<boolean>;
     /** Run the capability against the shared kit. */
     run: (kit: CircleAgentKit, params: Record<string, unknown>) => Promise<unknown> | unknown;
     /** Format handler output for chat. */

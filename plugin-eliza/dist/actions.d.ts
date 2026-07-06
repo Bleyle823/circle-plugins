@@ -6,9 +6,6 @@ export declare const requestUsdcAction: Action;
 export declare const payX402Action: Action;
 export declare const gatewayDepositAction: Action;
 export declare const gatewayBalanceAction: Action;
-export declare const executeContractAction: Action;
-export declare const bridgeUsdcAction: Action;
-export declare const swapQuoteAction: Action;
-export declare const swapAction: Action;
+export declare const requestFaucetAction: Action;
 export declare const allActions: Action[];
 //# sourceMappingURL=actions.d.ts.map

@@ -13,6 +13,7 @@ import { type Plugin } from "@elizaos/core";
 export declare const circlePlugin: Plugin;
 export default circlePlugin;
 export { CircleService, getKit } from "./service.js";
+export { CircleAgentKit } from "@circle-agent-kit/core";
 export { makeAction, type CircleActionSpec } from "./shared.js";
 export * from "./actions.js";
 export { circleWalletProvider } from "./provider.js";

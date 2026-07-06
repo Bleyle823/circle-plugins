@@ -1,46 +1,87 @@
-import { Service, type IAgentRuntime } from "@elizaos/core";
+import { Service, type IAgentRuntime, type ServiceTypeName, logger } from "@elizaos/core";
 import { CircleAgentKit } from "@circle-agent-kit/core";
+import { envSetting } from "./env.js";
 
 /**
- * Singleton service that owns a single CircleAgentKit instance for the agent.
+ * CircleService — owns and manages the CircleAgentKit instance for the agent.
  * Actions and providers resolve it via runtime.getService(CircleService.serviceType).
  */
 export class CircleService extends Service {
-  static serviceType = "circle-agent-kit";
-  capabilityDescription =
-    "Circle + Arc agent wallet: balances, USDC transfers, x402 nanopayments, payment requests.";
+  static serviceType: ServiceTypeName = "circle" as ServiceTypeName;
+  private _kit?: CircleAgentKit;
 
-  public kit!: CircleAgentKit;
+  constructor(runtime: IAgentRuntime) {
+    super(runtime);
+  }
 
   static async start(runtime: IAgentRuntime): Promise<CircleService> {
     const service = new CircleService(runtime);
-    const get = (k: string): string | undefined => {
-      const v = runtime.getSetting?.(k) ?? process.env[k];
-      return v == null ? undefined : String(v);
-    };
-    service.kit = CircleAgentKit.create({
-      apiKey: get("CIRCLE_API_KEY"),
-      entitySecret: get("ENTITY_SECRET"),
-      network: (get("CIRCLE_NETWORK") as "TESTNET" | "MAINNET") ?? undefined,
-      defaultChain: get("CIRCLE_DEFAULT_CHAIN") ?? undefined,
-      walletSetId: get("CIRCLE_WALLET_SET_ID") ?? undefined,
-      x402PrivateKey: get("X402_PRIVATE_KEY") ?? undefined,
-      x402Chain: get("X402_CHAIN") ?? undefined,
-    });
     return service;
   }
 
+  static async stop(runtime: IAgentRuntime): Promise<void> {
+    const service = runtime.getService<CircleService>(CircleService.serviceType);
+    if (service) {
+      await service.stop();
+    }
+  }
+
+  get capabilityDescription(): string {
+    return "Circle + Arc agent wallet: balances, USDC transfers, x402 nanopayments, and payment requests.";
+  }
+
+  async initialize(_runtime: IAgentRuntime): Promise<void> {
+    // Kit is lazily initialized on first use to ensure env is ready.
+  }
+
   async stop(): Promise<void> {
-    // No persistent connections to tear down.
+    // No specific cleanup needed for CircleAgentKit
+  }
+
+  get kit(): CircleAgentKit {
+    if (!this._kit) {
+      const r = this.runtime;
+      const apiKey = envSetting(r, "CIRCLE_API_KEY");
+      const entitySecret =
+        envSetting(r, "ENTITY_SECRET") ?? envSetting(r, "CIRCLE_ENTITY_SECRET");
+      const x402PrivateKey =
+        envSetting(r, "X402_PRIVATE_KEY") ?? envSetting(r, "CLIENT_PRIVATE_KEY");
+
+      try {
+        this._kit = CircleAgentKit.create({
+          apiKey: apiKey ?? "dummy",
+          entitySecret: entitySecret ?? "dummy",
+          network: (envSetting(r, "CIRCLE_NETWORK") as "TESTNET" | "MAINNET") ?? "TESTNET",
+          defaultChain: envSetting(r, "CIRCLE_DEFAULT_CHAIN") ?? "ARC-TESTNET",
+          walletSetId: envSetting(r, "CIRCLE_WALLET_SET_ID"),
+          x402PrivateKey,
+          x402Chain: envSetting(r, "X402_CHAIN") ?? "arcTestnet",
+          sellerAddress: envSetting(r, "SERVER_ADDRESS"),
+        });
+      } catch (error) {
+        if (!x402PrivateKey) throw error;
+        logger.warn(
+          `[CircleService] Full kit init failed (${error}). Using nanopayment-only mode.`
+        );
+        this._kit = CircleAgentKit.create({
+          apiKey: "dummy",
+          entitySecret: "dummy",
+          x402PrivateKey,
+          x402Chain: envSetting(r, "X402_CHAIN") ?? "arcTestnet",
+          sellerAddress: envSetting(r, "SERVER_ADDRESS"),
+        });
+      }
+    }
+    return this._kit;
   }
 }
 
 /** Helper for actions to fetch the kit from the runtime. */
 export function getKit(runtime: IAgentRuntime): CircleAgentKit {
-  const service = runtime.getService(CircleService.serviceType) as CircleService | null;
-  if (!service?.kit) {
+  const service = runtime.getService<CircleService>(CircleService.serviceType);
+  if (!service) {
     throw new Error(
-      "CircleService is not initialized. Ensure @circle-agent-kit/plugin-eliza is registered and CIRCLE_API_KEY / ENTITY_SECRET are set."
+      "CircleService not found in runtime. Make sure circlePlugin is registered."
     );
   }
   return service.kit;

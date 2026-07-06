@@ -1,1 +1,1 @@
-{"version":3,"file":"provider.d.ts","sourceRoot":"","sources":["../src/provider.ts"],"names":[],"mappings":"AAAA,OAAO,KAAK,EAAyB,QAAQ,EAAyB,MAAM,eAAe,CAAC;AAI5F;;;GAGG;AACH,eAAO,MAAM,oBAAoB,EAAE,QA2DlC,CAAC"}
+{"version":3,"file":"provider.d.ts","sourceRoot":"","sources":["../src/provider.ts"],"names":[],"mappings":"AAAA,OAAO,KAAK,EAAyB,QAAQ,EAAyB,MAAM,eAAe,CAAC;AAK5F;;GAEG;AACH,eAAO,MAAM,oBAAoB,EAAE,QAqDlC,CAAC"}

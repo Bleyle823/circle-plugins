@@ -1,9 +1,12 @@
 import { convo, makeAction } from "./shared.js";
+import { defaultPaywallUrl, extractUrl, normalizePaywallUrl } from "./params.js";
+import { wantsGatewayBalance, wantsWalletBalance, wantsX402Payment } from "./intent.js";
 export const createWalletAction = makeAction({
     name: "CIRCLE_CREATE_WALLET",
     similes: ["CREATE_WALLET", "NEW_WALLET", "MAKE_AGENT_WALLET", "SETUP_WALLET"],
     description: "Create a new Circle developer-controlled agent wallet on the configured chain (default Arc Testnet). " +
         'Params: { chain?: string, accountType?: "EOA"|"SCA" }.',
+    validate: async (_runtime, message) => /\b(create|new|setup|make)\b.*\b(wallet)\b/i.test(String(message?.content?.text ?? "")),
     run: (kit, p) => kit.createWallet({
         chain: p.chain,
         accountType: p.accountType,
@@ -17,9 +20,9 @@ export const createWalletAction = makeAction({
 export const checkBalanceAction = makeAction({
     name: "CIRCLE_CHECK_BALANCE",
     similes: ["CHECK_BALANCE", "WALLET_BALANCE", "USDC_BALANCE", "HOW_MUCH_USDC", "MY_BALANCE"],
-    description: "Check the USDC (and other token) balances for an agent wallet. Params: { walletId: string }.",
-    requiredParams: ["walletId"],
-    run: (kit, p) => kit.getBalance(p.walletId),
+    description: "Check the USDC (and other token) balances for an agent wallet. Params: { walletId?: string }.",
+    validate: async (_runtime, message) => wantsWalletBalance(String(message?.content?.text ?? "")),
+    run: (kit, p) => kit.getBalance(p.walletId || process.env.CIRCLE_WALLET_ID),
     formatResult: (balances) => {
         const usdc = balances.find((b) => (b.symbol ?? "").toUpperCase() === "USDC");
         const extra = balances.length > 1 ? ` (+${balances.length - 1} other tokens)` : "";
@@ -36,6 +39,10 @@ export const sendUsdcAction = makeAction({
         "Mainnet or large transfers require confirm: true. " +
         "Params: { walletId: string, destinationAddress: string, amount: string|number, chain?, confirm?: boolean, wait?: boolean }.",
     requiredParams: ["walletId", "destinationAddress", "amount"],
+    validate: async (_runtime, message) => {
+        const text = String(message?.content?.text ?? "");
+        return /\b(send|transfer|pay)\b/i.test(text) && /0x[a-fA-F0-9]{40}/.test(text);
+    },
     run: (kit, p) => kit.sendUSDC({
         walletId: p.walletId,
         destinationAddress: p.destinationAddress,
@@ -55,6 +62,7 @@ export const requestUsdcAction = makeAction({
     description: "Create a USDC payment request (invoice + EIP-681 payment URI/QR) to receive funds. " +
         "Params: { amount: string|number, destinationAddress: string, chain?, memo? }.",
     requiredParams: ["amount", "destinationAddress"],
+    validate: async (_runtime, message) => /\b(invoice|payment\s+request|request\s+usdc)\b/i.test(String(message?.content?.text ?? "")),
     run: (kit, p) => kit.createPaymentRequest({
         amount: String(p.amount),
         destinationAddress: p.destinationAddress,
@@ -66,17 +74,37 @@ export const requestUsdcAction = makeAction({
         convo("Request 10 USDC to 0x2222222222222222222222222222222222222222", "Here is your payment request.", "CIRCLE_REQUEST_USDC"),
     ],
 });
-// --- Dev-controlled SDK: Contracts, Bridge, Swap ---------------------------
 export const payX402Action = makeAction({
     name: "CIRCLE_PAY_X402",
     similes: ["PAY_X402", "NANOPAYMENT", "PAY_API", "PAY_RESOURCE", "MICROPAYMENT"],
     description: "Pay for an x402-compatible resource with a gas-free USDC nanopayment via Circle Gateway. " +
-        "Params: { url: string, method?: string, body?: unknown }.",
-    requiredParams: ["url"],
-    run: (kit, p) => kit.payX402(p.url, { method: p.method, body: p.body }),
-    formatResult: (r) => `Paid ${r.url} via gas-free nanopayment${r.amount ? ` (${r.amount} USDC)` : ""}.`,
+        `Default URL: ${defaultPaywallUrl()} (GET /risk-profile, $0.01 USDC). ` +
+        "Params: { url?: string, method?: string, body?: unknown }.",
+    validate: async (_runtime, message) => {
+        const text = String(message?.content?.text ?? "");
+        return wantsX402Payment(text) || Boolean(extractUrl(text));
+    },
+    run: (kit, p) => {
+        const url = normalizePaywallUrl(String(p.url || defaultPaywallUrl()));
+        return kit.payX402(url, { method: p.method, body: p.body });
+    },
+    formatResult: (r) => {
+        const amount = r.formattedAmount ?? r.amount;
+        const lines = [
+            `Paid ${r.url} via gas-free nanopayment${amount ? ` (${amount} USDC)` : ""}.`,
+        ];
+        if (r.data && typeof r.data === "object") {
+            lines.push(`Response: ${JSON.stringify(r.data)}`);
+        }
+        if (r.transaction)
+            lines.push(`Gateway transfer ID: ${r.transaction}`);
+        if (r.explorerUrl)
+            lines.push(`View on explorer: ${r.explorerUrl}`);
+        return lines.join("\n");
+    },
     examples: [
-        convo("Pay https://api.example.com/llm and get the result", "Making a gas-free nanopayment.", "CIRCLE_PAY_X402"),
+        convo("Pay for the risk profile at the x402 paywall", "Making a gas-free nanopayment.", "CIRCLE_PAY_X402,REPLY"),
+        convo("Pay http://localhost:4021/risk-profile and return the result", "Making a gas-free nanopayment.", "CIRCLE_PAY_X402,REPLY"),
     ],
 });
 export const gatewayDepositAction = makeAction({
@@ -85,6 +113,8 @@ export const gatewayDepositAction = makeAction({
     description: "Deposit USDC into the Circle Gateway balance to fund future x402 nanopayments. Requires confirm: true. " +
         "Params: { amount: string|number, confirm: boolean }.",
     requiredParams: ["amount"],
+    validate: async (_runtime, message) => /\b(deposit|fund)\b/i.test(String(message?.content?.text ?? "")) &&
+        /\bgateway\b/i.test(String(message?.content?.text ?? "")),
     run: (kit, p) => kit.gatewayDeposit(String(p.amount), Boolean(p.confirm)),
     formatResult: (r) => `Deposited ${r.amount} USDC into Gateway.`,
     examples: [
@@ -95,96 +125,41 @@ export const gatewayBalanceAction = makeAction({
     name: "CIRCLE_GATEWAY_BALANCE",
     similes: ["GATEWAY_BALANCE", "NANOPAYMENT_BALANCE"],
     description: "Check the Circle Gateway (nanopayments) USDC balance. Params: { address?: string }.",
+    validate: async (_runtime, message) => wantsGatewayBalance(String(message?.content?.text ?? "")),
     run: (kit, p) => kit.gatewayBalance(p.address),
     formatResult: (b) => `Gateway balance: ${b.available} USDC.`,
-    examples: [convo("What's my gateway balance?", "Checking your Gateway balance.", "CIRCLE_GATEWAY_BALANCE")],
-});
-export const executeContractAction = makeAction({
-    name: "CIRCLE_EXECUTE_CONTRACT",
-    similes: ["EXECUTE_CONTRACT", "CALL_CONTRACT", "CONTRACT_WRITE", "APPROVE_TOKEN"],
-    description: "Execute a write function on a smart contract from a wallet (SDK-native). Always requires confirm: true. " +
-        'Params: { walletId: string, contractAddress: string, abiFunctionSignature?: string (e.g. "approve(address,uint256)"), ' +
-        "abiParameters?: any[], callData?: string, amount?: string, chain?, confirm: boolean, wait?: boolean }.",
-    requiredParams: ["walletId", "contractAddress"],
-    run: (kit, p) => kit.executeContract({
-        walletId: p.walletId,
-        contractAddress: p.contractAddress,
-        abiFunctionSignature: p.abiFunctionSignature,
-        abiParameters: p.abiParameters,
-        callData: p.callData,
-        amount: p.amount != null ? String(p.amount) : undefined,
-        chain: p.chain,
-        confirm: Boolean(p.confirm),
-        wait: p.wait !== false,
-    }),
-    formatResult: (tx) => `Contract execution ${tx.id} is ${tx.state}.${tx.explorerUrl ? ` ${tx.explorerUrl}` : ""}`,
     examples: [
-        convo("Approve 1 USDC allowance for 0xSpender on the USDC contract, confirmed", "Executing the approve call.", "CIRCLE_EXECUTE_CONTRACT"),
+        convo("What's my gateway balance?", "Checking your Gateway balance.", "CIRCLE_GATEWAY_BALANCE,REPLY"),
     ],
 });
-export const bridgeUsdcAction = makeAction({
-    name: "CIRCLE_BRIDGE_USDC",
-    similes: ["BRIDGE_USDC", "CCTP_BRIDGE", "MOVE_USDC_CROSSCHAIN", "CROSSCHAIN_USDC"],
-    description: "Bridge USDC across chains via CCTP v2 (approve -> burn -> attest -> mint) using SDK wallets. " +
-        "Needs a source wallet on fromChain and a destination wallet on toChain. Mainnet/large amounts require confirm: true. " +
-        "Params: { toChain: string, sourceWalletId: string, destWalletId: string, amount: string|number, fromChain?, mintRecipient?, waitForMint?: boolean, confirm?: boolean }.",
-    requiredParams: ["toChain", "sourceWalletId", "destWalletId", "amount"],
-    run: (kit, p) => kit.bridgeUSDC({
-        toChain: p.toChain,
-        sourceWalletId: p.sourceWalletId,
-        destWalletId: p.destWalletId,
-        amount: String(p.amount),
-        fromChain: p.fromChain,
-        mintRecipient: p.mintRecipient,
-        waitForMint: p.waitForMint !== false,
-        confirm: Boolean(p.confirm),
-    }),
-    formatResult: (r) => r.state === "COMPLETE"
-        ? `Bridged ${r.amount} USDC ${r.fromChain} -> ${r.toChain}. Burn ${r.burnTxHash ?? r.burnTxId}, mint ${r.mintTxHash ?? r.mintTxId}.`
-        : `Burned ${r.amount} USDC on ${r.fromChain} (tx ${r.burnTxHash ?? r.burnTxId}); minting on ${r.toChain} pending.`,
-    examples: [
-        convo("Bridge 10 USDC from my Base wallet to Arbitrum, confirmed", "Bridging 10 USDC via CCTP.", "CIRCLE_BRIDGE_USDC"),
+export const requestFaucetAction = makeAction({
+    name: "CIRCLE_REQUEST_FAUCET",
+    similes: [
+        "REQUEST_FAUCET",
+        "FAUCET",
+        "GET_TESTNET_USDC",
+        "REQUEST_GAS",
+        "GAS_FAUCET",
+        "FUND_WALLET",
+        "TOP_UP_WALLET",
+        "GET_GAS",
     ],
-});
-export const swapQuoteAction = makeAction({
-    name: "CIRCLE_SWAP_QUOTE",
-    similes: ["SWAP_QUOTE", "PRICE_QUOTE", "QUOTE_SWAP"],
-    description: "Get a DEX swap quote (SDK-native, via configured aggregator). sellAmount is in base units. " +
-        "Params: { sellToken: string, buyToken: string, sellAmount: string, takerAddress: string, chain?, slippageBps? }.",
-    requiredParams: ["sellToken", "buyToken", "sellAmount", "takerAddress"],
-    run: (kit, p) => kit.swapQuote({
-        sellToken: p.sellToken,
-        buyToken: p.buyToken,
-        sellAmount: String(p.sellAmount),
-        takerAddress: p.takerAddress,
+    description: "Request free testnet USDC (and native gas, when the chain needs it) from the Circle faucet " +
+        "to fund an agent wallet. Testnet only — falls back to CIRCLE_WALLET_ID if no walletId is given. " +
+        "Params: { walletId?: string, address?: string, chain?: string, native?: boolean, usdc?: boolean, eurc?: boolean }.",
+    validate: async (_runtime, message) => /\b(faucet|testnet\s+usdc|top\s*up|fund\s+my\s+wallet)\b/i.test(String(message?.content?.text ?? "")),
+    run: (kit, p) => kit.requestFaucet({
+        walletId: p.walletId ?? process.env.CIRCLE_WALLET_ID,
+        address: p.address,
         chain: p.chain,
-        slippageBps: p.slippageBps != null ? Number(p.slippageBps) : undefined,
+        native: p.native,
+        usdc: p.usdc,
+        eurc: p.eurc,
     }),
-    formatResult: (q) => `Quote: ${q.sellAmount} ${q.sellToken} -> ${q.buyAmount} ${q.buyToken}.`,
+    formatResult: (r) => r.note,
     examples: [
-        convo("Quote swapping 10 USDC to EURC", "Getting a swap quote.", "CIRCLE_SWAP_QUOTE"),
-    ],
-});
-export const swapAction = makeAction({
-    name: "CIRCLE_SWAP",
-    similes: ["SWAP_TOKENS", "EXECUTE_SWAP", "TRADE_TOKENS"],
-    description: "Swap one token for another from a wallet (SDK-native, via configured DEX aggregator + contract execution). " +
-        "sellAmount is in base units. Mainnet/large swaps require confirm: true. " +
-        "Params: { walletId: string, walletAddress: string, sellToken: string, buyToken: string, sellAmount: string, chain?, slippageBps?, confirm?: boolean }.",
-    requiredParams: ["walletId", "walletAddress", "sellToken", "buyToken", "sellAmount"],
-    run: (kit, p) => kit.swap({
-        walletId: p.walletId,
-        walletAddress: p.walletAddress,
-        sellToken: p.sellToken,
-        buyToken: p.buyToken,
-        sellAmount: String(p.sellAmount),
-        chain: p.chain,
-        slippageBps: p.slippageBps != null ? Number(p.slippageBps) : undefined,
-        confirm: Boolean(p.confirm),
-    }),
-    formatResult: (r) => `Swap submitted (tx ${r.swapTxId}): ${r.quote.sellAmount} ${r.quote.sellToken} -> ~${r.quote.buyAmount} ${r.quote.buyToken}.`,
-    examples: [
-        convo("Swap 10 USDC to EURC from my wallet, confirmed", "Executing the swap.", "CIRCLE_SWAP"),
+        convo("My wallet has no gas, can you request some testnet USDC from the faucet?", "Requesting testnet USDC from the Circle faucet now.", "CIRCLE_REQUEST_FAUCET"),
+        convo("Top up my wallet from the faucet", "Funding your wallet from the Circle faucet.", "CIRCLE_REQUEST_FAUCET"),
     ],
 });
 export const allActions = [
@@ -195,9 +170,6 @@ export const allActions = [
     payX402Action,
     gatewayDepositAction,
     gatewayBalanceAction,
-    executeContractAction,
-    bridgeUsdcAction,
-    swapQuoteAction,
-    swapAction,
+    requestFaucetAction,
 ];
 //# sourceMappingURL=actions.js.map

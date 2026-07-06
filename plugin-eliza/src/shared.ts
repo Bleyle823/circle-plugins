@@ -23,6 +23,8 @@ export interface CircleActionSpec {
   examples?: ActionExample[][];
   /** Params required before invoking the kit; missing ones raise a clear error. */
   requiredParams?: string[];
+  /** Optional validate; defaults to always true. */
+  validate?: (runtime: IAgentRuntime, message: Memory) => Promise<boolean>;
   /** Run the capability against the shared kit. */
   run: (kit: CircleAgentKit, params: Record<string, unknown>) => Promise<unknown> | unknown;
   /** Format handler output for chat. */
@@ -50,17 +52,17 @@ export function makeAction(spec: CircleActionSpec): Action {
     name: spec.name,
     similes: spec.similes ?? [],
     description: spec.description,
-    validate: async (_runtime: IAgentRuntime, _message: Memory) => true,
+    validate: spec.validate ?? (async () => true),
     handler: async (
       runtime: IAgentRuntime,
       message: Memory,
-      _state?: State,
+      state?: State,
       options?: Record<string, unknown>,
       callback?: HandlerCallback,
       responses?: Memory[]
     ): Promise<ActionResult> => {
       try {
-        const params = resolveParams(message, options, responses);
+        const params = resolveParams(message, state, options, responses);
         assertRequired(spec, params);
 
         const kit = getKit(runtime);
@@ -90,8 +92,9 @@ export function makeAction(spec: CircleActionSpec): Action {
 
 /** Small helper for building example conversations. */
 export function convo(user: string, agent: string, action: string): ActionExample[] {
+  const actions = action.includes(",") ? action.split(",").map((a) => a.trim()) : [action];
   return [
     { name: "user", content: { text: user } } as ActionExample,
-    { name: "agent", content: { text: agent, action } } as ActionExample,
+    { name: "agent", content: { text: agent, action: actions[0], actions } } as ActionExample,
   ];
 }
