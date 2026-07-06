@@ -168,7 +168,7 @@ export class CircleAgentKit {
     });
 
     return {
-      id: step.txHash ?? "pending",
+      id: step.txHash ? `tx:${step.txHash}` : "pending",
       state: step.state === "success" ? "COMPLETE" : step.state.toUpperCase(),
       txHash: step.txHash,
       explorerUrl: step.explorerUrl,

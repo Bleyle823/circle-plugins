@@ -16,6 +16,8 @@ export interface CircleAgentConfig {
     x402PrivateKey?: string;
     /** x402 chain (as understood by @circle-fin/x402-batching, e.g. "base-sepolia"). */
     x402Chain?: string;
+    /** Seller address for paywalled server. */
+    sellerAddress?: string;
     /** Circle CLI binary for Agent Stack ops (Agent Wallets). Defaults to "circle". */
     cliBin?: string;
     /** DEX aggregator base URL for SDK-native swaps (0x-compatible schema). */

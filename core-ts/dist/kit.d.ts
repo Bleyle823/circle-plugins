@@ -242,6 +242,21 @@ export declare class CircleAgentKit {
     }): Promise<CliResult>;
     /** Look up a Circle contract address (usdc, cctp, gateway, ...). */
     agentContractAddress(name: string, chain?: string): Promise<CliResult>;
+    /** Search for available services in the Circle Agent Marketplace. */
+    servicesSearch(params: {
+        query?: string;
+        category?: string;
+        type?: string;
+        limit?: number;
+        offset?: number;
+    }): Promise<CliResult>;
+    /** Inspect a service URL to see its price, schema, and requirements. */
+    servicesInspect(params: {
+        url: string;
+        method?: string;
+        data?: string;
+        headers?: string[];
+    }): Promise<CliResult>;
     /**
      * Execute a write function on a smart contract from the agent wallet.
      * Requires confirm (arbitrary contract calls can move funds).

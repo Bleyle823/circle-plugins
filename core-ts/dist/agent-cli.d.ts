@@ -106,5 +106,20 @@ export declare class CircleAgentCli {
         chain: string;
         amount?: string;
     }): Promise<CliResult>;
+    /** Search for available services in the Circle Agent Marketplace. */
+    servicesSearch(params: {
+        query?: string;
+        category?: string;
+        type?: string;
+        limit?: number;
+        offset?: number;
+    }): Promise<CliResult>;
+    /** Inspect a service URL to see its price, schema, and requirements. */
+    servicesInspect(params: {
+        url: string;
+        method?: string;
+        data?: string;
+        headers?: string[];
+    }): Promise<CliResult>;
 }
 //# sourceMappingURL=agent-cli.d.ts.map

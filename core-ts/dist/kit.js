@@ -115,7 +115,7 @@ export class CircleAgentKit {
             token: "USDC",
         });
         return {
-            id: step.txHash ?? "pending",
+            id: step.txHash ? `tx:${step.txHash}` : "pending",
             state: step.state === "success" ? "COMPLETE" : step.state.toUpperCase(),
             txHash: step.txHash,
             explorerUrl: step.explorerUrl,
@@ -335,6 +335,14 @@ export class CircleAgentKit {
     /** Look up a Circle contract address (usdc, cctp, gateway, ...). */
     async agentContractAddress(name, chain) {
         return this.agentCli().contractAddress(name, this.chainOr(chain));
+    }
+    /** Search for available services in the Circle Agent Marketplace. */
+    async servicesSearch(params) {
+        return this.agentCli().servicesSearch(params);
+    }
+    /** Inspect a service URL to see its price, schema, and requirements. */
+    async servicesInspect(params) {
+        return this.agentCli().servicesInspect(params);
     }
     /**
      * Execute a write function on a smart contract from the agent wallet.

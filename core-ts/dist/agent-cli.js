@@ -203,5 +203,35 @@ export class CircleAgentCli {
             args.push("--amount", params.amount);
         return this.run(args);
     }
+    // --- Services ----------------------------------------------------------
+    /** Search for available services in the Circle Agent Marketplace. */
+    async servicesSearch(params) {
+        const args = ["services", "search"];
+        if (params.query)
+            args.push(params.query);
+        if (params.category)
+            args.push("--category", params.category);
+        if (params.type)
+            args.push("--type", params.type);
+        if (params.limit)
+            args.push("--limit", String(params.limit));
+        if (params.offset)
+            args.push("--offset", String(params.offset));
+        return this.run(args);
+    }
+    /** Inspect a service URL to see its price, schema, and requirements. */
+    async servicesInspect(params) {
+        const args = ["services", "inspect", params.url];
+        if (params.method)
+            args.push("--method", params.method);
+        if (params.data)
+            args.push("--data", params.data);
+        if (params.headers) {
+            for (const h of params.headers) {
+                args.push("--header", h);
+            }
+        }
+        return this.run(args);
+    }
 }
 //# sourceMappingURL=agent-cli.js.map

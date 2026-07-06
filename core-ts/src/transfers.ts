@@ -2,6 +2,7 @@ import { v4 as uuidv4 } from "uuid";
 import type { CircleWalletsClient } from "./client.js";
 import { getChain } from "./chains.js";
 import { err } from "./errors.js";
+import { isCircleUuid, isTxHash } from "./ids.js";
 import type { FeeEstimate, TransactionInfo, TransactionState } from "./types.js";
 import { getBalance } from "./wallets.js";
 
@@ -92,6 +93,14 @@ export async function getTransaction(
   id: string,
   chain?: string
 ): Promise<TransactionInfo> {
+  if (!isCircleUuid(id)) {
+    throw err(
+      "VALIDATION",
+      isTxHash(id)
+        ? `Id "${id}" is an on-chain tx hash, not a Circle wallet transfer UUID. Use the explorer URL instead of getTransaction.`
+        : `Invalid Circle transfer id "${id}" (expected UUID). Gateway x402 transfer IDs cannot be used with wallet getTransaction.`
+    );
+  }
   const res = await client.getTransaction({ id });
   const tx = res?.data?.transaction ?? res?.data;
   if (!tx) throw err("NOT_FOUND", `No transaction found for id "${id}".`);

@@ -51,8 +51,16 @@ export interface NanopaymentResult {
     paid: boolean;
     /** Response body returned by the paid resource, if any. */
     data?: unknown;
-    /** Amount charged, when reported by the server. */
+    /** Amount charged (base units), when reported by the server. */
     amount?: string;
+    /** Human-readable amount (e.g. "0.01"), when reported. */
+    formattedAmount?: string;
+    /** Circle Gateway transfer UUID for the settled payment, when reported. */
+    transaction?: string;
+    /** Payer (buyer) address that signed the nanopayment. */
+    payer?: string;
+    /** Block explorer URL for the payer address on the payment chain. */
+    explorerUrl?: string;
     status?: number;
 }
 export interface GatewayBalance {

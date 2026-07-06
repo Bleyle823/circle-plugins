@@ -20,6 +20,8 @@ export interface CircleAgentConfig {
   x402PrivateKey?: string;
   /** x402 chain (as understood by @circle-fin/x402-batching, e.g. "base-sepolia"). */
   x402Chain?: string;
+  /** Seller address for paywalled server. */
+  sellerAddress?: string;
   /** Circle CLI binary for Agent Stack ops (Agent Wallets). Defaults to "circle". */
   cliBin?: string;
   /** DEX aggregator base URL for SDK-native swaps (0x-compatible schema). */
@@ -62,27 +64,34 @@ export function resolveConfig(
     confirmThresholdUsdc:
       overrides.confirmThresholdUsdc ??
       asNumber(env.CIRCLE_CONFIRM_THRESHOLD_USDC, 100),
-    x402PrivateKey: overrides.x402PrivateKey ?? env.X402_PRIVATE_KEY ?? undefined,
+    x402PrivateKey: overrides.x402PrivateKey ?? env.X402_PRIVATE_KEY ?? env.CLIENT_PRIVATE_KEY ?? undefined,
     x402Chain: overrides.x402Chain ?? env.X402_CHAIN ?? undefined,
+    sellerAddress: overrides.sellerAddress ?? env.SERVER_ADDRESS ?? undefined,
     cliBin: overrides.cliBin ?? env.CIRCLE_CLI_BIN ?? undefined,
     swapApiUrl: overrides.swapApiUrl ?? env.SWAP_API_URL ?? undefined,
     swapApiKey: overrides.swapApiKey ?? env.SWAP_API_KEY ?? undefined,
     kitKey: overrides.kitKey ?? env.CIRCLE_KIT_KEY ?? env.KIT_KEY ?? undefined,
   };
 
-  if (!config.apiKey) {
-    throw err(
-      "CONFIG_MISSING",
-      "CIRCLE_API_KEY is required. Set it in the environment or pass apiKey."
-    );
-  }
-  if (!config.entitySecret) {
-    throw err(
-      "CONFIG_MISSING",
-      "ENTITY_SECRET (or CIRCLE_ENTITY_SECRET) is required. Generate and register it: " +
-        "bun run register:entity-secret (in the circle Eliza workspace) or " +
-        "https://developers.circle.com/wallets/dev-controlled/register-entity-secret"
-    );
+  // Only require API key and entity secret if not in nanopayment-only mode
+  const hasX402 = Boolean(config.x402PrivateKey);
+  const needsFullConfig = !hasX402 || config.apiKey !== "dummy";
+  
+  if (needsFullConfig) {
+    if (!config.apiKey || config.apiKey === "dummy") {
+      throw err(
+        "CONFIG_MISSING",
+        "CIRCLE_API_KEY is required. Set it in the environment or pass apiKey."
+      );
+    }
+    if (!config.entitySecret || config.entitySecret === "dummy") {
+      throw err(
+        "CONFIG_MISSING",
+        "ENTITY_SECRET (or CIRCLE_ENTITY_SECRET) is required. Generate and register it: " +
+          "bun run register:entity-secret (in the circle Eliza workspace) or " +
+          "https://developers.circle.com/wallets/dev-controlled/register-entity-secret"
+      );
+    }
   }
   return config;
 }
