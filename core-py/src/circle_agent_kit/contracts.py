@@ -1,6 +1,6 @@
 """SDK-native contract execution, CCTP bridge, and swap.
 
-Mirrors packages/core-ts/src/contracts.ts. Built on the developer-controlled
+Mirrors packages/core-circle/src/contracts.ts. Built on the developer-controlled
 wallet the rest of the kit uses — no Circle CLI or separate session required.
 """
 

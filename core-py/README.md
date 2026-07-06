@@ -1,6 +1,6 @@
 # circle_agent_kit (Python)
 
-Python mirror of `@circle-agent-kit/core`. Powers the Hermes Agent plugin and
+Python mirror of `@circle-plugins/core`. Powers the Hermes Agent plugin and
 exposes the same capability surface (snake_case method names).
 
 ```python
@@ -10,6 +10,7 @@ kit = CircleAgentKit.create()  # reads env: CIRCLE_API_KEY, ENTITY_SECRET, ...
 
 wallet = kit.create_wallet(chain="ARC-TESTNET")
 print(kit.faucet_info()["faucetUrl"])       # fund at faucet.circle.com
+kit.request_faucet(address=wallet["address"], chain="ARC-TESTNET")  # API drip
 
 balance = kit.get_usdc_balance(wallet["id"])
 tx = kit.send_usdc(wallet["id"], "0x...", "0.01", wait=True)

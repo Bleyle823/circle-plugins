@@ -1,4 +1,4 @@
-"""Security guardrails — mirrors packages/core-ts/src/guardrails.ts."""
+"""Security guardrails — mirrors packages/core-circle/src/guardrails.ts."""
 
 from __future__ import annotations
 

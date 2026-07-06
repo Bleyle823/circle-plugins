@@ -1,4 +1,4 @@
-"""Circle Agent Stack via the `circle` CLI — mirrors packages/core-ts/src/agent-cli.ts.
+"""Circle Agent Stack via the `circle` CLI — mirrors packages/core-circle/src/agent-cli.ts.
 
 Agent Wallets are user-controlled MPC wallets operated through the Circle CLI
 (authenticate, fund, transfer, bridge, swap, execute contract). This module

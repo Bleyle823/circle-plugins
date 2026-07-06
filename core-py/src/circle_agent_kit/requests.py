@@ -1,11 +1,15 @@
-"""Payment requests + faucet info — mirrors packages/core-ts/src/requests.ts."""
+"""Payment requests + faucet — mirrors packages/core-circle/src/requests.ts."""
 
 from __future__ import annotations
 
 import uuid
 from datetime import datetime, timezone
+from typing import Optional
+
+import requests
 
 from .chains import get_chain
+from .errors import err
 from .guardrails import assert_positive_amount, assert_valid_address
 
 
@@ -63,5 +67,84 @@ def faucet_info(chain: str) -> dict:
             "then paste your wallet address."
             if info.testnet
             else f"{info.name} is a mainnet chain — fund from a real USDC source; no faucet."
+        ),
+    }
+
+
+FAUCET_URL = "https://api.circle.com/v1/faucet/drips"
+
+
+def request_faucet(
+    api_key: str,
+    address: str,
+    chain: str,
+    native: Optional[bool] = None,
+    usdc: Optional[bool] = None,
+    eurc: Optional[bool] = None,
+) -> dict:
+    """Request free testnet tokens from Circle's faucet API. Testnet only."""
+    info = get_chain(chain)
+    if not info.testnet:
+        raise err(
+            "MAINNET_BLOCKED",
+            f"{info.name} is a mainnet chain — the Circle faucet only dispenses testnet tokens. "
+            "Fund it from a real USDC source instead.",
+        )
+    assert_valid_address(address, chain)
+
+    wants_native = native if native is not None else not info.usdc_is_gas
+    wants_usdc = True if usdc is None else usdc
+    wants_eurc = bool(eurc)
+
+    try:
+        res = requests.post(
+            FAUCET_URL,
+            headers={
+                "Authorization": f"Bearer {api_key}",
+                "Content-Type": "application/json",
+            },
+            json={
+                "address": address,
+                "blockchain": info.id,
+                "native": wants_native,
+                "usdc": wants_usdc,
+                "eurc": wants_eurc,
+            },
+            timeout=30,
+        )
+    except requests.RequestException as exc:
+        raise err("UPSTREAM", "Failed to reach the Circle faucet API.", exc) from exc
+
+    if not res.ok:
+        if res.status_code == 403:
+            raise err(
+                "UPSTREAM",
+                "Circle rejected the faucet API request (403 Forbidden) for this account. "
+                "The /v1/faucet/drips API requires faucet access enabled on your account. "
+                f"Request testnet tokens manually at https://faucet.circle.com for {address} instead.",
+            )
+        message = f"Faucet request failed with status {res.status_code}."
+        try:
+            body = res.json()
+            if isinstance(body, dict) and body.get("message"):
+                message = f"Faucet request failed: {body['message']}"
+        except ValueError:
+            pass
+        raise err("UPSTREAM", message)
+
+    requested_list = [
+        wants_native and "native gas",
+        wants_usdc and "USDC",
+        wants_eurc and "EURC",
+    ]
+    requested_list = [x for x in requested_list if x]
+
+    return {
+        "chain": info.id,
+        "address": address,
+        "requested": {"native": wants_native, "usdc": wants_usdc, "eurc": wants_eurc},
+        "note": (
+            f"Requested {' + '.join(requested_list)} from the Circle faucet for {address} "
+            f"on {info.name}. Funds usually arrive within a minute — check the balance shortly."
         ),
     }

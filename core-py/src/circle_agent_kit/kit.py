@@ -1,4 +1,4 @@
-"""CircleAgentKit (Python) — mirrors packages/core-ts/src/kit.ts.
+"""CircleAgentKit (Python) — mirrors packages/core-circle/src/kit.ts.
 
 The unified capability surface used by the Hermes plugin.
 """
@@ -283,6 +283,31 @@ class CircleAgentKit:
 
     def faucet_info(self, chain: Optional[str] = None) -> dict:
         return req.faucet_info(self._chain(chain))
+
+    def request_faucet(
+        self,
+        wallet_id: Optional[str] = None,
+        address: Optional[str] = None,
+        chain: Optional[str] = None,
+        native: Optional[bool] = None,
+        usdc: Optional[bool] = None,
+        eurc: Optional[bool] = None,
+    ) -> dict:
+        c = self._chain(chain)
+        resolved = address or (self.get_address(wallet_id) if wallet_id else None)
+        if not resolved:
+            raise err(
+                "VALIDATION",
+                "request_faucet needs either a wallet_id (to look up its address) or an explicit address.",
+            )
+        return req.request_faucet(
+            api_key=self.config.api_key,
+            address=resolved,
+            chain=c,
+            native=native,
+            usdc=usdc,
+            eurc=eurc,
+        )
 
     # --- Contracts / Bridge / Swap (SDK-native) ---
     # CLI Agent Stack's execute/bridge/swap using the same dev-controlled wallet.

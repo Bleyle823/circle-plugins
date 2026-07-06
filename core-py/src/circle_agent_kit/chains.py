@@ -1,4 +1,4 @@
-"""Chain registry — mirrors packages/core-ts/src/chains.ts."""
+"""Chain registry — mirrors packages/core-circle/src/chains.ts."""
 
 from __future__ import annotations
 

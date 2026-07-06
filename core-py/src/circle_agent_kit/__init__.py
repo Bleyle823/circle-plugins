@@ -6,7 +6,7 @@ from .contracts import address_to_bytes32
 from .config import CircleAgentConfig, resolve_config
 from .errors import CircleAgentError, err
 from .kit import CircleAgentKit
-from .requests import create_payment_request, faucet_info, to_base_units
+from .requests import create_payment_request, faucet_info, request_faucet, to_base_units
 
 __all__ = [
     "CircleAgentKit",
@@ -24,6 +24,7 @@ __all__ = [
     "list_chains",
     "create_payment_request",
     "faucet_info",
+    "request_faucet",
     "to_base_units",
 ]
 
