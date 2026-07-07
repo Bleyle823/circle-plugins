@@ -198,6 +198,7 @@ class CircleAgentKit:
             amounts=[amount],
             fee_level=fee_level,
             idempotency_key=str(uuid.uuid4()),
+            blockchain=c,
         )
         tx_id = _get(res, "data", "id")
         if not tx_id:

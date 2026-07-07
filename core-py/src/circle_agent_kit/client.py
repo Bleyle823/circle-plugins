@@ -7,6 +7,7 @@ adapts the official `circle-developer-controlled-wallets` Python SDK.
 
 from __future__ import annotations
 
+import json
 import uuid
 from typing import Any, Protocol
 
@@ -55,6 +56,12 @@ class _SdkAdapter:
 
     def __init__(self, sdk_client: Any):
         self._c = sdk_client
+        from circle.web3.developer_controlled_wallets.api import (  # noqa: PLC0415
+            transactions_api,
+            wallets_api,
+        )
+        self._wallets_api = wallets_api.WalletsApi(sdk_client)
+        self._tx_api = transactions_api.TransactionsApi(sdk_client)
 
     @staticmethod
     def _dump(resp: Any) -> dict:
@@ -66,62 +73,104 @@ class _SdkAdapter:
         return resp if isinstance(resp, dict) else {"data": resp}
 
     def create_wallet_set(self, name: str) -> dict:
-        return self._dump(self._c.create_wallet_set(name=name))
+        return self._dump(self._wallets_api.create_wallet_set(
+            create_wallet_set_request={"name": name}
+        ))
 
     def create_wallets(self, wallet_set_id, blockchains, count, account_type) -> dict:
         return self._dump(
-            self._c.create_wallets(
-                wallet_set_id=wallet_set_id,
-                blockchains=blockchains,
-                count=count,
-                account_type=account_type,
+            self._wallets_api.create_wallet(
+                create_wallet_request={
+                    "walletSetId": wallet_set_id,
+                    "blockchains": blockchains,
+                    "count": count,
+                    "accountType": account_type,
+                }
             )
         )
 
     def list_wallets(self, wallet_set_id, blockchain) -> dict:
-        return self._dump(self._c.list_wallets(wallet_set_id=wallet_set_id, blockchain=blockchain))
+        return self._dump(self._wallets_api.get_wallets(
+            wallet_set_id=wallet_set_id, blockchain=blockchain
+        ))
 
     def get_wallet(self, wallet_id) -> dict:
-        return self._dump(self._c.get_wallet(id=wallet_id))
+        return self._dump(self._wallets_api.get_wallet(id=wallet_id))
 
     def get_wallet_token_balance(self, wallet_id) -> dict:
-        return self._dump(self._c.get_wallet_token_balance(id=wallet_id))
+        return self._dump(self._wallets_api.list_wallet_balance(id=wallet_id))
 
     def create_transaction(
-        self, wallet_id, token_address, destination_address, amounts, fee_level, idempotency_key
-    ) -> dict:
-        return self._dump(
-            self._c.create_transaction(
+            self,
+            wallet_id,
+            token_address,
+            destination_address,
+            amounts,
+            fee_level,
+            idempotency_key,
+            blockchain=None,
+        ) -> dict:
+            from circle.web3.developer_controlled_wallets.api.transactions_api import (  # noqa: PLC0415
+                CreateTransferTransactionForDeveloperRequest,
+            )
+
+            bc = None
+            if blockchain:
+                from circle.web3.developer_controlled_wallets.models.create_transfer_transaction_for_developer_request_blockchain import (  # noqa: PLC0415, E501
+                    CreateTransferTransactionForDeveloperRequestBlockchain,
+                )
+                bc = CreateTransferTransactionForDeveloperRequestBlockchain.from_json(
+                    json.dumps(blockchain)
+                )
+
+            req = CreateTransferTransactionForDeveloperRequest(
                 wallet_id=wallet_id,
-                token_address=token_address,
+                token_address=token_address or None,
                 destination_address=destination_address,
                 amounts=amounts,
-                fee={"type": "level", "config": {"feeLevel": fee_level}},
+                fee_level=fee_level,
                 idempotency_key=idempotency_key,
+                blockchain=bc,
             )
-        )
+            return self._dump(
+                self._tx_api.create_developer_transaction_transfer(
+                    create_transfer_transaction_for_developer_request=req,
+                )
+            )
 
     def get_transaction(self, transaction_id) -> dict:
-        return self._dump(self._c.get_transaction(id=transaction_id))
+        return self._dump(self._tx_api.get_transaction(id=transaction_id))
 
     def estimate_transfer_fee(self, wallet_id, token_address, destination_address, amounts) -> dict:
         return self._dump(
-            self._c.estimate_transfer_fee(
-                wallet_id=wallet_id,
-                token_address=token_address,
-                destination_address=destination_address,
-                amounts=amounts,
+            self._tx_api.estimate_transfer_fee(
+                estimate_transfer_fee_request={
+                    "walletId": wallet_id,
+                    "tokenAddress": token_address,
+                    "destinationAddress": destination_address,
+                    "amounts": amounts,
+                }
             )
         )
 
     def accelerate_transaction(self, transaction_id) -> dict:
         return self._dump(
-            self._c.accelerate_transaction(id=transaction_id, idempotency_key=str(uuid.uuid4()))
+            self._tx_api.accelerate_transaction(
+                accelerate_transaction_request={
+                    "idempotencyKey": str(uuid.uuid4()),
+                },
+                id=transaction_id,
+            )
         )
 
     def cancel_transaction(self, transaction_id) -> dict:
         return self._dump(
-            self._c.cancel_transaction(id=transaction_id, idempotency_key=str(uuid.uuid4()))
+            self._tx_api.cancel_transaction(
+                cancel_transaction_request={
+                    "idempotencyKey": str(uuid.uuid4()),
+                },
+                id=transaction_id,
+            )
         )
 
     def create_contract_execution_transaction(
@@ -135,21 +184,23 @@ class _SdkAdapter:
         fee_level,
         idempotency_key,
     ) -> dict:
-        kwargs: dict = {
-            "wallet_id": wallet_id,
-            "contract_address": contract_address,
+        body = {
+            "walletId": wallet_id,
+            "contractAddress": contract_address,
             "fee": {"type": "level", "config": {"feeLevel": fee_level}},
-            "idempotency_key": idempotency_key,
+            "idempotencyKey": idempotency_key,
         }
         if abi_function_signature is not None:
-            kwargs["abi_function_signature"] = abi_function_signature
+            body["abiFunctionSignature"] = abi_function_signature
         if abi_parameters is not None:
-            kwargs["abi_parameters"] = abi_parameters
+            body["abiParameters"] = abi_parameters
         if call_data is not None:
-            kwargs["call_data"] = call_data
+            body["callData"] = call_data
         if amount is not None:
-            kwargs["amount"] = amount
-        return self._dump(self._c.create_contract_execution_transaction(**kwargs))
+            body["amount"] = amount
+        return self._dump(self._tx_api.create_contract_execution_transaction(
+            create_contract_execution_transaction_request=body
+        ))
 
 
 def create_wallets_client(config: CircleAgentConfig) -> WalletsClient:
