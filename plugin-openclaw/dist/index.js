@@ -1,4 +1,4 @@
-import { definePluginEntry } from "openclaw/plugin-sdk";
+import { definePluginEntry } from "openclaw/plugin-sdk/plugin-entry";
 import { circleTools, runTool } from "./tools.js";
 /**
  * OpenClaw plugin for Circle + Arc agent wallets.
@@ -11,7 +11,7 @@ import { circleTools, runTool } from "./tools.js";
  * so OpenClaw can discover ownership without loading this runtime.
  */
 export default definePluginEntry({
-    id: "circle-agent-kit",
+    id: "circle-plugins",
     name: "Circle Agent Kit",
     description: "Circle + Arc agent wallet: balances, USDC transfers, x402 nanopayments, and payment requests.",
     register: (api) => {

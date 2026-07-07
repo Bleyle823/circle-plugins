@@ -7,47 +7,100 @@
   "activation": {
     "onStartup": false
   },
-  "config": {
-    "CIRCLE_API_KEY": { "type": "string", "secret": true, "description": "Circle API key (PREFIX:ID:SECRET)." },
-    "ENTITY_SECRET": { "type": "string", "secret": true, "description": "32-byte hex entity secret (registered by you)." },
-    "CIRCLE_NETWORK": { "type": "string", "default": "TESTNET", "description": "TESTNET or MAINNET." },
-    "CIRCLE_DEFAULT_CHAIN": { "type": "string", "default": "ARC-TESTNET", "description": "Default chain id." },
-    "X402_PRIVATE_KEY": { "type": "string", "secret": true, "description": "Buyer key for x402 nanopayments." },
-    "X402_CHAIN": { "type": "string", "default": "base-sepolia", "description": "Chain for x402 nanopayments." },
-    "X402_PAYWALL_URL": { "type": "string", "description": "Default x402 paywall URL for circle_pay_x402." },
-    "X402_PAYWALL_PORT": { "type": "string", "default": "4021", "description": "Local paywall port when X402_PAYWALL_URL is unset." },
-    "CIRCLE_CLI_BIN": { "type": "string", "default": "circle", "description": "Circle CLI binary for Agent Stack ops (npm i -g @circle-fin/cli)." },
-    "SWAP_API_URL": { "type": "string", "description": "DEX aggregator base URL for SDK-native swaps (0x-compatible)." },
-    "SWAP_API_KEY": { "type": "string", "secret": true, "description": "DEX aggregator API key (e.g. 0x)." }
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "CIRCLE_NETWORK": {
+        "type": "string",
+        "default": "TESTNET",
+        "description": "TESTNET or MAINNET."
+      },
+      "CIRCLE_DEFAULT_CHAIN": {
+        "type": "string",
+        "default": "ARC-TESTNET",
+        "description": "Default chain id."
+      },
+      "X402_CHAIN": {
+        "type": "string",
+        "default": "arcTestnet",
+        "description": "Chain for x402 nanopayments."
+      },
+      "X402_PAYWALL_URL": {
+        "type": "string",
+        "description": "Default x402 paywall URL for circle_pay_x402."
+      },
+      "X402_PAYWALL_PORT": {
+        "type": "string",
+        "default": "4021",
+        "description": "Local paywall port when X402_PAYWALL_URL is unset."
+      },
+      "CIRCLE_CLI_BIN": {
+        "type": "string",
+        "default": "circle",
+        "description": "Circle CLI binary for Agent Stack ops."
+      },
+      "SWAP_API_URL": {
+        "type": "string",
+        "description": "DEX aggregator base URL for SDK-native swaps."
+      }
+    }
+  },
+  "uiHints": {
+    "CIRCLE_NETWORK": {
+      "label": "Circle Network",
+      "help": "Use TESTNET for Arc testnet development."
+    },
+    "CIRCLE_DEFAULT_CHAIN": {
+      "label": "Default Chain",
+      "help": "Default chain for wallet operations (e.g. ARC-TESTNET)."
+    },
+    "X402_CHAIN": {
+      "label": "x402 Chain",
+      "help": "Chain slug for x402 nanopayments (e.g. arcTestnet, base-sepolia)."
+    }
   },
   "contracts": {
     "tools": [
-      { "name": "circle_create_wallet", "optional": false },
-      { "name": "circle_check_balance", "optional": false },
-      { "name": "circle_faucet_info", "optional": false },
-      { "name": "circle_request_faucet", "optional": false },
-      { "name": "circle_request_usdc", "optional": false },
-      { "name": "circle_gateway_balance", "optional": false },
-      { "name": "circle_swap_quote", "optional": false },
-      { "name": "circle_send_usdc", "optional": true },
-      { "name": "circle_pay_x402", "optional": true },
-      { "name": "circle_gateway_deposit", "optional": true },
-      { "name": "circle_execute_contract", "optional": true },
-      { "name": "circle_bridge_usdc", "optional": true },
-      { "name": "circle_swap", "optional": true },
-      { "name": "circle_agent_login_init", "optional": false },
-      { "name": "circle_agent_login_complete", "optional": false },
-      { "name": "circle_agent_list_wallets", "optional": false },
-      { "name": "circle_agent_balance", "optional": false },
-      { "name": "circle_agent_bridge_fee", "optional": false },
-      { "name": "circle_agent_bridge_status", "optional": false },
-      { "name": "circle_agent_swap_quote", "optional": false },
-      { "name": "circle_agent_contract_address", "optional": false },
-      { "name": "circle_agent_fund", "optional": true },
-      { "name": "circle_agent_transfer", "optional": true },
-      { "name": "circle_agent_bridge", "optional": true },
-      { "name": "circle_agent_swap", "optional": true },
-      { "name": "circle_agent_execute_contract", "optional": true }
+      "circle_create_wallet",
+      "circle_check_balance",
+      "circle_faucet_info",
+      "circle_request_faucet",
+      "circle_request_usdc",
+      "circle_gateway_balance",
+      "circle_swap_quote",
+      "circle_send_usdc",
+      "circle_pay_x402",
+      "circle_gateway_deposit",
+      "circle_execute_contract",
+      "circle_bridge_usdc",
+      "circle_swap",
+      "circle_agent_login_init",
+      "circle_agent_login_complete",
+      "circle_agent_list_wallets",
+      "circle_agent_balance",
+      "circle_agent_bridge_fee",
+      "circle_agent_bridge_status",
+      "circle_agent_swap_quote",
+      "circle_agent_contract_address",
+      "circle_agent_fund",
+      "circle_agent_transfer",
+      "circle_agent_bridge",
+      "circle_agent_swap",
+      "circle_agent_execute_contract"
     ]
+  },
+  "toolMetadata": {
+    "circle_send_usdc": { "optional": true },
+    "circle_pay_x402": { "optional": true },
+    "circle_gateway_deposit": { "optional": true },
+    "circle_execute_contract": { "optional": true },
+    "circle_bridge_usdc": { "optional": true },
+    "circle_swap": { "optional": true },
+    "circle_agent_fund": { "optional": true },
+    "circle_agent_transfer": { "optional": true },
+    "circle_agent_bridge": { "optional": true },
+    "circle_agent_swap": { "optional": true },
+    "circle_agent_execute_contract": { "optional": true }
   }
 }

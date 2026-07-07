@@ -19,8 +19,11 @@
     "typecheck": "tsc --noEmit"
   },
   "keywords": ["openclaw", "plugin", "circle", "usdc", "arc", "x402", "nanopayments"],
+  "openclaw": {
+    "extensions": ["./dist/index.js"]
+  },
   "dependencies": {
-    "@circle-plugins/core": "workspace:*"
+    "@circle-plugins/core": "file:../core-ts"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",

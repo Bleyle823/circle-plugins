@@ -8,7 +8,7 @@
  * The generated `openclaw.plugin.json` (see repo) declares `contracts.tools`
  * so OpenClaw can discover ownership without loading this runtime.
  */
-declare const _default: import("openclaw/plugin-sdk").PluginEntryConfig;
+declare const _default: import("openclaw/plugin-sdk/plugin-entry").PluginEntryConfig;
 export default _default;
 export { circleTools } from "./tools.js";
 //# sourceMappingURL=index.d.ts.map
