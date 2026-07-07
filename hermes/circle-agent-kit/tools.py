@@ -1,14 +1,16 @@
 """Tool handlers — what runs when the Hermes model calls a Circle tool.
 
-Each handler wraps the shared `circle_agent_kit` Python core so behavior matches
-the TypeScript plugins for Eliza and OpenClaw.
+Each handler wraps the shared ``circle_agent_kit`` Python core. Handlers follow
+the Hermes plugin contract: ``(args: dict, **kwargs) -> str`` returning JSON.
 """
 
 from __future__ import annotations
 
 import json
 import os
-from typing import Any
+from typing import Any, Callable
+
+from plugins.plugin_utils import lazy_singleton
 
 try:
     from .params import resolve_paywall_url
@@ -24,34 +26,47 @@ except Exception as exc:  # noqa: BLE001 - surface a clear install hint
 else:
     _IMPORT_ERROR = None
 
-_kit = None
 
-
+@lazy_singleton
 def _get_kit():
-    global _kit
     if _IMPORT_ERROR is not None:
         raise RuntimeError(
-            "circle_agent_kit is not installed. Install the Python core: "
-            "pip install -e packages/core-py  (from the circle-agent-kit repo)."
+            "circle_agent_kit is not installed. Install the Python core into the "
+            "Hermes venv: pip install -e ~/.hermes/core-py[circle]"
         )
-    if _kit is None:
-        _kit = CircleAgentKit.create()
-    return _kit
+    return CircleAgentKit.create()
 
 
-def _wrap(fn) -> Any:
-    """Run a handler, returning a JSON string result or an error string."""
+def is_available() -> bool:
+    """Gate tool visibility when the core package or credentials are missing."""
+    if _IMPORT_ERROR is not None:
+        return False
+    if not os.getenv("CIRCLE_API_KEY", "").strip():
+        return False
+    if not os.getenv("ENTITY_SECRET", "").strip():
+        return False
+    return True
 
-    def inner(args: dict | None = None):
+
+def _error_json(message: str, *, code: str = "ERROR", **extra: Any) -> str:
+    payload = {"error": message, "code": code, **extra}
+    return json.dumps(payload)
+
+
+def _wrap(fn: Callable[[Any, dict], Any]):
+    """Run a handler, returning a JSON string result."""
+
+    def handler(args: dict | None = None, **kwargs) -> str:
+        del kwargs  # forward-compatible; unused today
         args = args or {}
         try:
             return json.dumps(fn(_get_kit(), args), default=str, indent=2)
         except CircleAgentError as e:  # type: ignore[misc]
-            return f"Error [{getattr(e, 'code', 'ERROR')}]: {e}"
+            return _error_json(str(e), code=getattr(e, "code", "ERROR"))
         except Exception as e:  # noqa: BLE001
-            return f"Error: {e}"
+            return _error_json(str(e))
 
-    return inner
+    return handler
 
 
 create_wallet = _wrap(
@@ -109,8 +124,6 @@ gateway_deposit = _wrap(
 )
 
 gateway_balance = _wrap(lambda kit, a: kit.gateway_balance(a.get("address")))
-
-# --- Contracts / Bridge / Swap (SDK-native, dev-controlled wallet) -----------
 
 execute_contract = _wrap(
     lambda kit, a: kit.execute_contract(
@@ -186,14 +199,19 @@ services_inspect = _wrap(
 def status_summary() -> str:
     """Human-readable status for the /circle slash command and CLI."""
     if _IMPORT_ERROR is not None:
-        return "circle-agent-kit: core not installed (pip install -e packages/core-py)."
+        return (
+            "circle-plugins: core not installed. Run: "
+            "pip install -e ~/.hermes/core-py[circle]"
+        )
+    if not is_available():
+        return "circle-plugins: set CIRCLE_API_KEY and ENTITY_SECRET in ~/.hermes/.env"
     try:
         kit = _get_kit()
         chain = kit.get_chain()
         return (
-            f"circle-agent-kit ready. Network={kit.config.network}, "
+            f"circle-plugins ready. Network={kit.config.network}, "
             f"default chain={chain.name} ({chain.id}). "
             f"Faucet: {kit.faucet_info().get('faucetUrl') or 'n/a (mainnet)'}."
         )
     except Exception as e:  # noqa: BLE001
-        return f"circle-agent-kit not ready: {e}"
+        return f"circle-plugins not ready: {e}"

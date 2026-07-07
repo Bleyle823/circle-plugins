@@ -1,9 +1,29 @@
 name: circle-plugins
 version: 0.1.0
 description: >
-  Circle Plugins for Hermes: check balances, send USDC, make gas-free
-  x402 nanopayments, request testnet faucet funds, and create USDC payment requests.
+  Circle Plugins for Hermes: developer-controlled wallets, USDC transfers,
+  gas-free x402 nanopayments, testnet faucet funding, and payment requests.
   Arc Testnet by default.
+author: Circle
+kind: backend
+provides_tools:
+  - circle_create_wallet
+  - circle_check_balance
+  - circle_faucet_info
+  - circle_request_faucet
+  - circle_send_usdc
+  - circle_request_usdc
+  - circle_pay_x402
+  - circle_gateway_deposit
+  - circle_gateway_balance
+  - circle_execute_contract
+  - circle_bridge_usdc
+  - circle_swap_quote
+  - circle_swap
+  - circle_services_search
+  - circle_services_inspect
+provides_hooks:
+  - post_tool_call
 requires_env:
   - name: CIRCLE_API_KEY
     description: "Circle API key (format PREFIX:ID:SECRET) from console.circle.com"
