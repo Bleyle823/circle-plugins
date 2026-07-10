@@ -2,9 +2,9 @@ import { motion } from "framer-motion";
 
 const stats = [
   { value: "99.8%", label: "of agent transaction volume on x402 is USDC" },
-  { value: "13", label: "ElizaOS actions available" },
+  { value: "8", label: "ElizaOS actions available" },
   { value: "3", label: "AI frameworks supported" },
-  { value: "$0.000001", label: "minimum payment amount" }
+  { value: "@0.1.0", label: "@circle-plugins/core on npm" }
 ];
 
 export function StatsSection() {

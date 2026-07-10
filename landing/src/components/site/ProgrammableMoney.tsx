@@ -22,7 +22,7 @@ export function ProgrammableMoney() {
             {[
               { h: "Sub-cent efficiency.", p: "Gas-free nanopayments starting at $0.000001." },
               { h: "Headless APIs.", p: "Agents paying agents for work too small to invoice." },
-              { h: "Unified SDK.", p: "One interface for ElizaOS, OpenClaw, and Hermes." },
+              { h: "Unified SDK.", p: "@circle-plugins/core — one interface for ElizaOS, OpenClaw, and Hermes." },
               { h: "Arc Testnet.", p: "Developer-controlled wallets with USDC as gas." },
             ].map((b, i) => (
               <motion.div

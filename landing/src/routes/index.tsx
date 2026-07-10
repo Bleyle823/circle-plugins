@@ -31,7 +31,7 @@ function Index() {
       </main>
       <StickyCTA />
       <footer className="px-8 md:px-14 py-10 text-mono text-[11px] tracking-[0.2em] text-white/40 flex justify-between border-t border-white/5">
-        <span>© 2026 CIRCLE AGENT KIT</span>
+        <span>© 2026 CIRCLE PLUGINS</span>
         <span>USDC · MADE FOR AGENTS</span>
       </footer>
     </div>

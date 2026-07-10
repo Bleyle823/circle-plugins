@@ -4,19 +4,19 @@ import { Brain, Cpu, Terminal } from "lucide-react";
 const frameworks = [
   {
     name: "ElizaOS",
-    description: "TypeScript plugin with 13 actions for wallet management, DeFi operations, and marketplace access",
+    description: "@circle-plugins/plugin-eliza — 8 actions for wallets, USDC transfers, x402 nanopayments, and payment requests",
     tech: "TypeScript",
     icon: Brain
   },
   {
     name: "OpenClaw",
-    description: "Compatible with ElizaOS plugin architecture for seamless agent integration",
+    description: "@circle-plugins/plugin-openclaw — 26 agent tools built on @circle-plugins/core@0.1.0",
     tech: "TypeScript",
     icon: Cpu
   },
   {
     name: "Hermes Agent",
-    description: "Python plugin with mirrored functionality for cross-language compatibility",
+    description: "hermes/circle-plugins — 15 Python tools powered by circle-plugins on PyPI",
     tech: "Python",
     icon: Terminal
   }

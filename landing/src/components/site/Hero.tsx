@@ -187,7 +187,7 @@ export function Hero() {
         </h1>
 
         <p className="mt-8 text-xl text-white/60 max-w-2xl leading-relaxed">
-          Unified SDK enabling ElizaOS, OpenClaw, and Hermes agents to perform USDC transfers, 
+          Unified <span className="text-white/80">@circle-plugins/core</span> SDK enabling ElizaOS, OpenClaw, and Hermes agents to perform USDC transfers,
           x402 nanopayments, cross-chain bridges, token swaps, and smart contract execution.
         </p>
 

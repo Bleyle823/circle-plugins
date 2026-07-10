@@ -15,7 +15,7 @@ const tabs: Tab[] = [
   {
     key: "eliza",
     label: "ELIZAOS",
-    prompt: "npm install @circle-agent-kit/plugin-eliza",
+    prompt: "npm install @circle-plugins/plugin-eliza @circle-plugins/core@0.1.0",
     steps: [
       { icon: "𝟭", label: "Install the plugin", price: "npm install" },
       { icon: "𝟮", label: "Configure environment", price: ".env" },
@@ -23,7 +23,7 @@ const tabs: Tab[] = [
     ],
     done: (
       <>
-        Done. Plugin registered. 13 actions available.
+        Done. Plugin registered. 8 actions available.
       </>
     ),
     panel: <ElizaPanel />,
@@ -31,31 +31,31 @@ const tabs: Tab[] = [
   {
     key: "openclaw",
     label: "OPENCLAW",
-    prompt: "pnpm add @circle-agent-kit/plugin-openclaw",
+    prompt: "pnpm add @circle-plugins/plugin-openclaw @circle-plugins/core@0.1.0",
     steps: [
       { icon: "𝟭", label: "Add the dependency", price: "pnpm add" },
       { icon: "𝟮", label: "Configure environment", price: ".env" },
       { icon: "𝟯", label: "Enable the plugin", price: "config.json" },
     ],
-    done: <>Done. OpenClaw tools active. 8 tools registered.</>,
+    done: <>Done. OpenClaw tools active. 26 tools registered.</>,
     panel: <OpenClawPanel />,
   },
   {
     key: "hermes",
     label: "HERMES",
-    prompt: "pip install -e packages/core-py",
+    prompt: "pip install circle-plugins[circle]",
     steps: [
-      { icon: "𝟭", label: "Install the core", price: "pip install" },
-      { icon: "𝟮", label: "Add the plugin", price: "cp -r" },
+      { icon: "𝟭", label: "Install the Python core", price: "pip install" },
+      { icon: "𝟮", label: "Copy the Hermes plugin", price: "hermes/circle-plugins" },
       { icon: "𝟯", label: "Configure and use", price: "export" },
     ],
-    done: <>Done. Hermes tools active. 14 tools mirrored.</>,
+    done: <>Done. Hermes tools active. 15 tools mirrored.</>,
     panel: <HermesPanel />,
   },
   {
     key: "core",
     label: "CORE SDK",
-    prompt: "npm install @circle-agent-kit/core",
+    prompt: "npm install @circle-plugins/core@0.1.0",
     steps: [
       { icon: "𝟭", label: "Install TypeScript core", price: "npm install" },
       { icon: "𝟮", label: "Initialize the kit", price: "CircleAgentKit.create()" },
@@ -220,10 +220,10 @@ function ElizaPanel() {
         <span className="text-mono text-[11px] text-panel-foreground/60">elizaos-config.ts</span>
       </div>
       <div className="mt-6 font-mono text-[12px] text-panel-foreground/80 space-y-2">
-        <p><span className="text-blue-600">import</span> &#123; circlePlugin &#125; <span className="text-blue-600">from</span> <span className="text-green-600">"@circle-agent-kit/plugin-eliza"</span></p>
+        <p><span className="text-blue-600">import</span> &#123; circlePlugin &#125; <span className="text-blue-600">from</span> <span className="text-green-600">"@circle-plugins/plugin-eliza"</span></p>
         <p><span className="text-blue-600">export default</span> &#123;</p>
         <p>&nbsp;&nbsp;plugins: [circlePlugin],</p>
-        <p>&nbsp;&nbsp;actions: [<span className="text-orange-600">"SEND_USDC"</span>, <span className="text-orange-600">"CREATE_WALLET"</span>, ...]</p>
+        <p>&nbsp;&nbsp;actions: [<span className="text-orange-600">"CIRCLE_CREATE_WALLET"</span>, <span className="text-orange-600">"CIRCLE_SEND_USDC"</span>, ...]</p>
         <p>&#125;</p>
       </div>
     </PanelShell>
@@ -243,11 +243,12 @@ function OpenClawPanel() {
       </div>
       <div className="mt-6 font-mono text-[12px] text-panel-foreground/80 space-y-2">
         <p>&#123;</p>
-        <p>&nbsp;&nbsp;<span className="text-blue-600">"name"</span>: <span className="text-green-600">"circle-agent-kit"</span>,</p>
+        <p>&nbsp;&nbsp;<span className="text-blue-600">"id"</span>: <span className="text-green-600">"circle-plugins"</span>,</p>
+        <p>&nbsp;&nbsp;<span className="text-blue-600">"name"</span>: <span className="text-green-600">"Circle Plugins"</span>,</p>
         <p>&nbsp;&nbsp;<span className="text-blue-600">"tools"</span>: [</p>
         <p>&nbsp;&nbsp;&nbsp;&nbsp;<span className="text-green-600">"circle_create_wallet"</span>,</p>
-        <p>&nbsp;&nbsp;&nbsp;&nbsp;<span className="text-green-600">"circle_check_balance"</span>,</p>
-        <p>&nbsp;&nbsp;&nbsp;&nbsp;<span className="text-green-600">"circle_send_usdc"</span></p>
+        <p>&nbsp;&nbsp;&nbsp;&nbsp;<span className="text-green-600">"circle_send_usdc"</span>,</p>
+        <p>&nbsp;&nbsp;&nbsp;&nbsp;<span className="text-green-600">"circle_pay_x402"</span></p>
         <p>&nbsp;&nbsp;]</p>
         <p>&#125;</p>
       </div>
@@ -264,15 +265,14 @@ function HermesPanel() {
           <span className="h-2 w-2 rounded-full bg-panel-foreground/20" />
           <span className="h-2 w-2 rounded-full bg-panel-foreground/20" />
         </span>
-        <span className="text-mono text-[11px] text-panel-foreground/60">hermes_agent.py</span>
+        <span className="text-mono text-[11px] text-panel-foreground/60">~/.hermes/config.yaml</span>
       </div>
       <div className="mt-6 font-mono text-[12px] text-panel-foreground/80 space-y-2">
-        <p><span className="text-blue-600">from</span> circle_agent_kit <span className="text-blue-600">import</span> CircleAgentKit</p>
-        <p><span className="text-blue-600">from</span> hermes_core <span className="text-blue-600">import</span> HermesAgent</p>
-        <br />
-        <p>kit = CircleAgentKit.create()</p>
-        <p>agent = HermesAgent(tools=kit.get_tools())</p>
-        <p>agent.run(<span className="text-green-600">"send 10 USDC to 0x..."</span>)</p>
+        <p><span className="text-blue-600">#</span> pip install circle-plugins[circle]</p>
+        <p><span className="text-blue-600">#</span> cp -r hermes/circle-plugins ~/.hermes/plugins/</p>
+        <p>plugins:</p>
+        <p>&nbsp;&nbsp;enabled:</p>
+        <p>&nbsp;&nbsp;&nbsp;&nbsp;- <span className="text-green-600">circle-plugins</span></p>
       </div>
     </PanelShell>
   );
@@ -290,6 +290,7 @@ function CorePanel() {
         <span className="text-mono text-[11px] text-panel-foreground/60">app.ts</span>
       </div>
       <div className="mt-6 font-mono text-[12px] text-panel-foreground/80 space-y-2">
+        <p><span className="text-blue-600">import</span> &#123; CircleAgentKit &#125; <span className="text-blue-600">from</span> <span className="text-green-600">"@circle-plugins/core"</span></p>
         <p><span className="text-blue-600">const</span> kit = CircleAgentKit.create()</p>
         <p><span className="text-blue-600">const</span> wallet = <span className="text-blue-600">await</span> kit.createWallet()</p>
         <p><span className="text-blue-600">await</span> kit.sendUSDC(&#123;</p>
