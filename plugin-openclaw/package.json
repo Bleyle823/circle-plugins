@@ -20,7 +20,7 @@
   },
   "keywords": ["openclaw", "plugin", "circle", "usdc", "arc", "x402", "nanopayments"],
   "dependencies": {
-    "@circle-plugins/core": "workspace:*"
+    "@circle-plugins/core": "0.1.0"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
