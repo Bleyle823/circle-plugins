@@ -7,7 +7,7 @@ import type {
   Memory,
   State,
 } from "@elizaos/core";
-import { CircleAgentError, type CircleAgentKit } from "@circle-agent-kit/core";
+import { CircleAgentError, type CircleAgentKit } from "@circle-plugins/core";
 import { getKit } from "./service.js";
 import { resolveParams } from "./params.js";
 

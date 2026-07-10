@@ -1,5 +1,5 @@
 import type { Action, ActionExample, IAgentRuntime, Memory } from "@elizaos/core";
-import { type CircleAgentKit } from "@circle-agent-kit/core";
+import { type CircleAgentKit } from "@circle-plugins/core";
 /** A Circle capability adapted into an ElizaOS Action. */
 export interface CircleActionSpec {
     /** Uppercase action id, e.g. `CIRCLE_SEND_USDC`. */

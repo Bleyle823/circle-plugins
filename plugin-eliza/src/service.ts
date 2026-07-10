@@ -1,5 +1,5 @@
 import { Service, type IAgentRuntime, type ServiceTypeName, logger } from "@elizaos/core";
-import { CircleAgentKit } from "@circle-agent-kit/core";
+import { CircleAgentKit } from "@circle-plugins/core";
 import { envSetting } from "./env.js";
 
 /**

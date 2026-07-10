@@ -158,7 +158,7 @@ def create_wallets_client(config: CircleAgentConfig) -> WalletsClient:
     except Exception as e:  # noqa: BLE001
         raise err(
             "DEPENDENCY_MISSING",
-            "Install the Circle SDK: pip install 'circle-agent-kit[circle]' "
+            "Install the Circle SDK: pip install 'circle-plugins[circle]' "
             "(circle-developer-controlled-wallets).",
             e,
         ) from e

@@ -1,4 +1,4 @@
-import { CircleAgentError } from "@circle-agent-kit/core";
+import { CircleAgentError } from "@circle-plugins/core";
 import { getKit } from "./service.js";
 import { resolveParams } from "./params.js";
 function assertRequired(spec, params) {

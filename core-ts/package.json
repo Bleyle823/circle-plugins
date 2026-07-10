@@ -1,5 +1,5 @@
 {
-  "name": "@circle-agent-kit/core",
+  "name": "@circle-plugins/core",
   "version": "0.1.0",
   "description": "Unified Circle + Arc agent-wallet SDK: wallets, USDC transfers, x402 nanopayments, and payment requests.",
   "license": "Apache-2.0",
@@ -14,8 +14,12 @@
     }
   },
   "files": [
-    "dist"
+    "dist",
+    "README.md"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc --noEmit",

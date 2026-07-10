@@ -1,5 +1,5 @@
 import { logger, type Plugin } from "@elizaos/core";
-import { CircleAgentKit } from "@circle-agent-kit/core";
+import { CircleAgentKit } from "@circle-plugins/core";
 import { CircleService } from "./service.js";
 import { allActions } from "./actions.js";
 import { circleWalletProvider } from "./provider.js";
@@ -8,16 +8,16 @@ import { startPaywalledServer } from "./server.js";
 /**
  * ElizaOS plugin for Circle + Arc agent wallets.
  *
- * All Circle logic lives in `@circle-agent-kit/core`; this package only adapts
+ * All Circle logic lives in `@circle-plugins/core`; this package only adapts
  * that kit into ElizaOS Actions/Provider/Service so the same implementation is
  * shared with the OpenClaw plugin (and mirrored by the Hermes Python core).
  *
  * Register in your character config:
- *   plugins: ["@circle-agent-kit/plugin-eliza"]
+ *   plugins: ["@circle-plugins/plugin-eliza"]
  * and set CIRCLE_API_KEY + ENTITY_SECRET (and X402_PRIVATE_KEY for nanopayments).
  */
 export const circlePlugin: Plugin = {
-  name: "circle-agent-kit",
+  name: "circle-plugins",
   description:
     "Circle + Arc agent wallet: balances, USDC transfers, x402 nanopayments, and payment requests.",
   services: [CircleService],
@@ -39,7 +39,7 @@ export const circlePlugin: Plugin = {
         configured: missing.length === 0 && hasX402,
         nanopayments: hasX402,
       },
-      "[plugin-circle] circle-agent-kit initialized"
+      "[plugin-circle] circle-plugins initialized"
     );
     if (missing.length) {
       logger.warn(
@@ -93,7 +93,7 @@ export const circlePlugin: Plugin = {
 
 export default circlePlugin;
 export { CircleService, getKit } from "./service.js";
-export { CircleAgentKit } from "@circle-agent-kit/core";
+export { CircleAgentKit } from "@circle-plugins/core";
 export { makeAction, type CircleActionSpec } from "./shared.js";
 export * from "./actions.js";
 export { circleWalletProvider } from "./provider.js";

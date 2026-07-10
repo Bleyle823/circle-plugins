@@ -3,7 +3,7 @@
   "configVersion": 1,
   "workspaces": {
     "": {
-      "name": "@circle-agent-kit/core",
+      "name": "@circle-plugins/core",
       "dependencies": {
         "@circle-fin/adapter-circle-wallets": "^1.4.1",
         "@circle-fin/app-kit": "^1.8.1",

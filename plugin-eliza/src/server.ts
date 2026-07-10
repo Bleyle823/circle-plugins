@@ -1,6 +1,6 @@
 import express, { type Express } from "express";
 import { logger } from "@elizaos/core";
-import { CircleAgentKit } from "@circle-agent-kit/core";
+import { CircleAgentKit } from "@circle-plugins/core";
 
 export async function startPaywalledServer(
   kit: CircleAgentKit,

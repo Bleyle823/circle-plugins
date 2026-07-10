@@ -1,11 +1,11 @@
-# @circle-agent-kit/plugin-eliza
+# @circle-plugins/plugin-eliza
 
 ElizaOS plugin for Circle + Arc agent wallets: USDC transfers, x402 nanopayments, and payment requests.
 
 ## Install
 
 ```bash
-pnpm add @circle-agent-kit/plugin-eliza @elizaos/core
+pnpm add @circle-plugins/plugin-eliza @elizaos/core
 ```
 
 ## Configure
@@ -23,7 +23,7 @@ SERVER_ADDRESS=...          # for paywalled server (seller)
 Register the plugin:
 
 ```ts
-import { circlePlugin } from "@circle-agent-kit/plugin-eliza";
+import { circlePlugin } from "@circle-plugins/plugin-eliza";
 
 const runtime = new AgentRuntime({
   character,
@@ -51,8 +51,8 @@ const runtime = new AgentRuntime({
 The plugin includes a utility to start a paywalled Express server:
 
 ```ts
-import { CircleService } from "@circle-agent-kit/plugin-eliza";
-import { startPaywalledServer } from "@circle-agent-kit/plugin-eliza/server";
+import { CircleService } from "@circle-plugins/plugin-eliza";
+import { startPaywalledServer } from "@circle-plugins/plugin-eliza/server";
 
 const service = runtime.getService(CircleService.serviceType);
 await startPaywalledServer(service.kit, 4021);

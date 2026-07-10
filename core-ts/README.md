@@ -1,10 +1,10 @@
-# @circle-agent-kit/core
+# @circle-plugins/core
 
 Unified TypeScript SDK for Circle + Arc agent wallets. Powers the ElizaOS and
 OpenClaw plugins; mirrored by the Python `circle_agent_kit` core (for Hermes).
 
 ```ts
-import { CircleAgentKit } from "@circle-agent-kit/core";
+import { CircleAgentKit } from "@circle-plugins/core";
 
 const kit = CircleAgentKit.create(); // reads env (CIRCLE_API_KEY, ENTITY_SECRET, ...)
 

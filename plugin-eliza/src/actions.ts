@@ -7,7 +7,7 @@ import type {
   TokenBalance,
   TransactionInfo,
   WalletInfo,
-} from "@circle-agent-kit/core";
+} from "@circle-plugins/core";
 import { convo, makeAction } from "./shared.js";
 import { defaultPaywallUrl, extractUrl, normalizePaywallUrl } from "./params.js";
 import { wantsGatewayBalance, wantsWalletBalance, wantsX402Payment } from "./intent.js";

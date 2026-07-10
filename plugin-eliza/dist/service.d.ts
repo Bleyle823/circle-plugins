@@ -1,5 +1,5 @@
 import { Service, type IAgentRuntime, type ServiceTypeName } from "@elizaos/core";
-import { CircleAgentKit } from "@circle-agent-kit/core";
+import { CircleAgentKit } from "@circle-plugins/core";
 /**
  * CircleService — owns and manages the CircleAgentKit instance for the agent.
  * Actions and providers resolve it via runtime.getService(CircleService.serviceType).
