@@ -1,0 +1,55 @@
+# Dependencies
+node_modules/
+
+# Environment / secrets — never commit
+.env
+.env.local
+.env.*.local
+.env.production
+.env.development
+**/.env
+**/.env.local
+
+# Local architecture / license notes (keep private)
+ASSETS_LICENSES.md
+ARCHITECTURE.md
+**/ASSETS_LICENSES.md
+**/ARCHITECTURE.md
+
+# Build / tooling output
+dist/
+build/
+.output/
+.wrangler/
+.next/
+.turbo/
+coverage/
+*.tsbuildinfo
+
+# Logs & OS
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.DS_Store
+Thumbs.db
+
+# Editor / local
+.vscode/
+!.vscode/extensions.json
+.idea/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+.pytest_cache/
+
+# Package locks in plugin vendor copies (optional)
+# Keep root package-lock.json files that belong to published packages
+
+# Certs / keys
+*.pem
+*.key
