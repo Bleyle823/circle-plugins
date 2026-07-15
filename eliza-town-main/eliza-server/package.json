@@ -1,0 +1,34 @@
+{
+  "name": "eliza-town-server",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build:plugin": "npm run build --prefix ../packages/plugin-eliza",
+    "predev": "npm run build:plugin",
+    "prestart": "npm run build:plugin",
+    "dev": "tsx watch scripts/run.ts",
+    "start": "tsx scripts/run.ts",
+    "build": "tsc"
+  },
+  "dependencies": {
+    "@circle-plugins/core": "^0.1.0",
+    "@circle-plugins/plugin-eliza": "file:../packages/plugin-eliza",
+    "@elizaos/core": "^1.7.2",
+    "@elizaos/plugin-bootstrap": "^1.7.2",
+    "@elizaos/plugin-openai": "^1.6.0",
+    "@elizaos/plugin-openrouter": "^1.5.17",
+    "@elizaos/plugin-sql": "^1.7.2",
+    "@elizaos/server": "^1.7.2",
+    "@x402/core": "^2.3.0",
+    "@x402/evm": "^2.3.0",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "viem": "^2.55.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "tsx": "^4.23.0",
+    "typescript": "^5.1.3"
+  }
+}

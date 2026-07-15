@@ -1,0 +1,58 @@
+{
+  "name": "@circle-plugins/plugin-eliza",
+  "version": "0.1.0",
+  "description": "ElizaOS plugin for Circle + Arc agent wallets: USDC transfers, x402 nanopayments, and payment requests.",
+  "license": "Apache-2.0",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "keywords": [
+    "elizaos",
+    "circle",
+    "usdc",
+    "arc",
+    "x402",
+    "nanopayments",
+    "wallets"
+  ],
+  "agentConfig": {
+    "pluginType": "elizaos:plugin:1.0.0"
+  },
+  "dependencies": {
+    "@circle-fin/x402-batching": "^3.2.0",
+    "@circle-plugins/core": "^0.1.0",
+    "@x402/core": "^2.3.0",
+    "@x402/evm": "^2.3.0",
+    "express": "^5.2.1",
+    "viem": "^2.55.0"
+  },
+  "peerDependencies": {
+    "@elizaos/core": "^1.0.0"
+  },
+  "devDependencies": {
+    "@elizaos/core": "^1.7.2",
+    "@types/express": "^5.0.6",
+    "@types/node": "^22.0.0",
+    "typescript": "^5.9.2",
+    "vitest": "^2.1.0"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  }
+}
