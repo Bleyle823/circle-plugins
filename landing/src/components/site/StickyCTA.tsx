@@ -1,5 +1,6 @@
-import { Copy } from "lucide-react";
+import { Github } from "lucide-react";
 import { CircleLogo } from "./CircleLogo";
+import { NPM_CORE_URL, REPO_URL } from "@/lib/links";
 
 export function StickyCTA() {
   return (
@@ -9,12 +10,22 @@ export function StickyCTA() {
         <span className="text-mono text-[12px] tracking-[0.25em]">CIRCLE PLUGINS</span>
       </div>
       <div className="flex items-center gap-3">
-        <button className="inline-flex items-center gap-2 rounded-sm bg-panel text-panel-foreground px-4 py-2.5 text-mono text-[12px] tracking-wide hover:bg-white transition">
-          <Copy className="h-4 w-4" />
-          Integrate @circle-plugins
-        </button>
-        <a href="#getting-started" className="inline-flex items-center gap-2 rounded-sm border border-white/25 text-white px-4 py-2.5 text-mono text-[12px] tracking-wide hover:bg-white/5 transition">
-          Get the SDK →
+        <a
+          href={REPO_URL}
+          target="_blank"
+          rel="noreferrer"
+          className="inline-flex items-center gap-2 rounded-sm bg-panel text-panel-foreground px-4 py-2.5 text-mono text-[12px] tracking-wide hover:bg-white transition"
+        >
+          <Github className="h-4 w-4" />
+          Star on GitHub
+        </a>
+        <a
+          href={NPM_CORE_URL}
+          target="_blank"
+          rel="noreferrer"
+          className="inline-flex items-center gap-2 rounded-sm border border-white/25 text-white px-4 py-2.5 text-mono text-[12px] tracking-wide hover:bg-white/5 transition"
+        >
+          View on npm →
         </a>
       </div>
     </div>

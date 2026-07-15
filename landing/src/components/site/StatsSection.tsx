@@ -1,10 +1,10 @@
 import { motion } from "framer-motion";
 
 const stats = [
-  { value: "99.8%", label: "of agent transaction volume on x402 is USDC" },
-  { value: "8", label: "ElizaOS actions available" },
-  { value: "3", label: "AI frameworks supported" },
-  { value: "@0.1.0", label: "@circle-plugins/core on npm" }
+  { value: "0.1.0", label: "@circle-plugins/core on npm" },
+  { value: "8", label: "ElizaOS actions" },
+  { value: "26", label: "OpenClaw tools" },
+  { value: "15", label: "Hermes tools" },
 ];
 
 export function StatsSection() {
@@ -22,7 +22,9 @@ export function StatsSection() {
               className="text-center"
             >
               <div className="text-4xl md:text-5xl font-light text-accent-blue mb-4">{stat.value}</div>
-              <div className="text-white/50 text-[10px] md:text-xs font-mono tracking-[0.2em] uppercase">{stat.label}</div>
+              <div className="text-white/50 text-[10px] md:text-xs font-mono tracking-[0.2em] uppercase">
+                {stat.label}
+              </div>
             </motion.div>
           ))}
         </div>

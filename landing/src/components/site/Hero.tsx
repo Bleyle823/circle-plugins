@@ -1,55 +1,15 @@
 import { AnimatePresence, motion, useMotionValue, useSpring, useTransform } from "framer-motion";
-import { Copy } from "lucide-react";
+import { Copy, Github } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { NPM_CORE_URL, REPO_URL } from "@/lib/links";
 import { WavePattern } from "./WavePattern";
 
-function CursorTrail() {
-  const [trail, setTrail] = useState<{ x: number; y: number; id: number }[]>([]);
-  const nextId = useRef(0);
-
-  useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      const newPoint = { x: e.clientX, y: e.clientY, id: nextId.current++ };
-      setTrail((prev) => [...prev.slice(-15), newPoint]);
-    };
-    window.addEventListener("mousemove", handleMouseMove);
-    return () => window.removeEventListener("mousemove", handleMouseMove);
-  }, []);
-
-  return (
-    <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
-      <AnimatePresence>
-        {trail.map((point, i) => (
-          <motion.div
-            key={point.id}
-            initial={{ opacity: 0.4, scale: 1 }}
-            animate={{ opacity: 0, scale: 0 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
-            style={{
-              position: "absolute",
-              left: point.x,
-              top: point.y,
-              width: 20 + i * 2,
-              height: 20 + i * 2,
-              borderRadius: "50%",
-              backgroundColor: "var(--accent-blue)",
-              filter: "blur(15px)",
-              transform: "translate(-50%, -50%)",
-            }}
-          />
-        ))}
-      </AnimatePresence>
-    </div>
-  );
-}
-
 const phrases = [
-  { verb: "fund", tail: "your agent in one prompt." },
-  { verb: "bridge", tail: "USDC across chains." },
-  { verb: "pay", tail: "for APIs with nanopayments." },
-  { verb: "swap", tail: "tokens via DEX aggregators." },
-  { verb: "execute", tail: "smart contracts autonomously." },
+  { verb: "send", tail: "USDC from any agent chat." },
+  { verb: "pay", tail: "for APIs with x402 nanopayments." },
+  { verb: "fund", tail: "wallets on Arc in one prompt." },
+  { verb: "bridge", tail: "USDC across chains with CCTP." },
+  { verb: "hold", tail: "a Circle wallet on Eliza, OpenClaw, or Hermes." },
 ];
 
 export function Hero() {
@@ -105,7 +65,6 @@ export function Hero() {
       ref={sectionRef}
       className="relative min-h-[92vh] px-8 md:px-14 pt-40 pb-24 overflow-hidden"
     >
-      <CursorTrail />
       {/* Ambient glow orbs that drift with the cursor */}
       <motion.div
         aria-hidden
@@ -152,9 +111,9 @@ export function Hero() {
           ))}
         </div>
 
-        <h1 className="font-light tracking-[-0.02em] leading-[0.98] text-[clamp(3rem,8vw,7.5rem)] min-h-[2.1em]">
+        <h1 className="font-light tracking-[-0.02em] leading-[0.98] text-[clamp(2.4rem,6.5vw,5.5rem)] min-h-[2.4em]">
           <span className="block text-white">
-            Programmable money,{" "}
+            Circle Plugins to enable AI agents to{" "}
             <span className="relative inline-block align-baseline">
               <AnimatePresence mode="wait">
                 <motion.span
@@ -187,8 +146,16 @@ export function Hero() {
         </h1>
 
         <p className="mt-8 text-xl text-white/60 max-w-2xl leading-relaxed">
-          Unified <span className="text-white/80">@circle-plugins/core</span> SDK enabling ElizaOS, OpenClaw, and Hermes agents to perform USDC transfers,
-          x402 nanopayments, cross-chain bridges, token swaps, and smart contract execution.
+          Open source plugins for ElizaOS, OpenClaw, and Hermes — powered by{" "}
+          <a
+            href={NPM_CORE_URL}
+            target="_blank"
+            rel="noreferrer"
+            className="text-white/85 font-mono text-[17px] hover:text-accent-blue transition"
+          >
+            @circle-plugins/core
+          </a>{" "}
+          on npm.
         </p>
 
         <motion.div
@@ -197,12 +164,23 @@ export function Hero() {
           transition={{ duration: 0.7, delay: 0.5 }}
           className="mt-14 flex flex-wrap items-center gap-4"
         >
-          <a href="#getting-started" className="group inline-flex items-center gap-3 rounded-sm bg-panel text-panel-foreground px-5 py-3 text-mono text-[13px] tracking-wide shadow-[0_0_0_1px_rgba(255,255,255,0.06)] hover:bg-white transition">
-            <Copy className="h-4 w-4" />
-            Fund your agent in one prompt
+          <a
+            href={REPO_URL}
+            target="_blank"
+            rel="noreferrer"
+            className="group inline-flex items-center gap-3 rounded-sm bg-panel text-panel-foreground px-5 py-3 text-mono text-[13px] tracking-wide shadow-[0_0_0_1px_rgba(255,255,255,0.06)] hover:bg-white transition"
+          >
+            <Github className="h-4 w-4" />
+            github.com/Bleyle823/circle-plugins
           </a>
-          <a href="#marketplace" className="text-mono text-[13px] tracking-wide text-white/90 border-b border-white/50 pb-1 hover:text-accent-blue hover:border-accent-blue transition">
-            Browse the marketplace
+          <a
+            href={NPM_CORE_URL}
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex items-center gap-2 text-mono text-[13px] tracking-wide text-white/90 border-b border-white/50 pb-1 hover:text-accent-blue hover:border-accent-blue transition"
+          >
+            <Copy className="h-3.5 w-3.5" />
+            npm i @circle-plugins/core
           </a>
         </motion.div>
 
@@ -216,8 +194,7 @@ export function Hero() {
           <Chip label="ELIZAOS" glyph="✳" />
           <Chip label="OPENCLAW" glyph="◎" />
           <Chip label="HERMES" glyph="◼" />
-          <Chip label="CORE SDK" glyph="◐" />
-          <span className="text-white/50">+ CUSTOM AGENTS</span>
+          <Chip label="AI TOWN" glyph="◇" />
         </motion.div>
       </motion.div>
 
