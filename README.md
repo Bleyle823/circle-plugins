@@ -61,8 +61,24 @@ circle-plugins/
 ├── plugin-openclaw/      # OpenClaw plugin (26 tools)
 ├── hermes/
 │   └── circle-plugins/   # Hermes plugin (15 tools)
-└── landing/              # Marketing site (optional)
+├── eliza-town-main/      # Full Arc + Eliza Town demo (includes eliza-server)
+├── arc-town example/     # Earlier Arc Town upload (UI/Convex slice)
+└── landing/              # Marketing site
 ```
+
+### Eliza Town demo (`eliza-town-main/`)
+
+Pixel-art town powered by [ElizaOS](https://elizaos.ai) + [Convex](https://convex.dev), wired to the Circle plugin so agents can hold wallets on Arc. Prefer this folder for local development (it includes `eliza-server/`). See `eliza-town-main/README.md` for setup.
+
+```bash
+cd eliza-town-main
+cp .env.example .env          # then fill Circle + LLM keys (never commit .env)
+npm install
+npm run setup                 # sync env into Convex / Eliza server
+npm run dev
+```
+
+Secrets and local notes stay out of git: `.env`, `.env.local`, `eliza-server/.env`, `ASSETS_LICENSES.md`, and `ARCHITECTURE.md` are gitignored.
 
 ---
 
@@ -430,7 +446,8 @@ await kit.sendUSDC({
 
 ## Security
 
-- Never commit `.env`, `*.pem`, or recovery files.
+- Never commit `.env`, `.env.local`, `*.pem`, or recovery files (root `.gitignore` blocks them).
+- Local `ASSETS_LICENSES.md` / `ARCHITECTURE.md` notes are also gitignored — keep licensing attributions in package READMEs if they must ship.
 - Defaults to **TESTNET**. Mainnet and transfers above the confirm threshold (default **100 USDC**) require `confirm: true`.
 - Contract execution always requires explicit confirmation.
 - Mutating calls use unique idempotency keys; transfers can poll to a terminal state.
