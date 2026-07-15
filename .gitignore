@@ -53,3 +53,8 @@ venv/
 # Certs / keys
 *.pem
 *.key
+
+# Local DB / agent runtime state
+**/pglite/
+**/.eliza/
+**/eliza-server/**/data/
